@@ -16,19 +16,36 @@ import {
   Link,
 } from "@mui/material";
 
+import { ExerciceProvider } from "./Données/exercices";
+import { SeancesProvider } from "./Données/seancepage";
+
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
 //Routes
-import ForgotPassword from "./forgot-psw";
-import Register from "./register";
-import Planning from "./planning";
-import ListAct from "./list_act";
-import ExoAct from "./exo-act";
-import Echauffement from "./echauffement";
+import ForgotPassword from "./Connexion/forgot-psw";
+import Register from "./Connexion/register";
 
-import Test from "./test";
+import Planning from "./Planning/planning";
+import ExoAct from "./Planning/exo-act";
+import Calendrier from "./Planning/calendrier";
+import Notifs from "./Planning/notifs";
+import Seance from "./Planning/seance";
+
+import Profile from "./Profile/profile";
+import ProfileSettings from "./Profile/profile-settings";
+
+import BlocSeance from "./Seances/bloc-seance";
+import CreerSeance from "./Seances/creer-seance";
+import FinSeance from "./Seances/fin-seance";
+import SaveSeance from "./Seances/save_seance";
+import ResultatSeance from"./Seances/resultat_seance"; 
+import SeanceExo from "./Seances/seance-exo";
+
+import RemplacerExo from "./Exercices/remplacerexo";
+import ExercicePage from "./Données/exercicepage";
+import ExoSearch from "./Exercices/exo-search";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -41,7 +58,7 @@ function Login() {
   };
 
 
-  //Boîtes de formulaires
+  //Boîtes formulaires
   return (
     <Container maxWidth="sm">
       <Paper elevation={3} sx={{ mt: 8, p: 4 }}>
@@ -52,7 +69,7 @@ function Login() {
         <Typography variant="h5" align="center" gutterBottom>
           Connexion
         </Typography>
-
+      
         {/* Formulaire du mail + mdp */}
         <Box component="form" onSubmit={handleSubmit}>
           <TextField
@@ -110,15 +127,35 @@ function Login() {
 // Chemin Routes
 export default function App() {
   return (
+    <ExerciceProvider>
+      <SeancesProvider>
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/forgot-psw" element={<ForgotPassword />} />
         <Route path="/register" element={<Register />} />
+
         <Route path="/planning" element={<Planning/>} />
-        <Route path="/list_act" element={<ListAct/>}/>
         <Route path="/exo-act" element={<ExoAct/>}/>
-        <Route path="/echauffement" element={<Echauffement/>}/>
-        <Route path="/test" element={<Test/>}/>
+        <Route path="/calendrier" element={<Calendrier/>}/>
+        <Route path="/notifs" element={<Notifs/>}/>
+        <Route path="/seance/:seanceId/" element={<Seance/>} />
+        
+        <Route path="/profile" element={<Profile/>}/>
+        <Route path="/profile-settings" element={<ProfileSettings/>}/>
+
+        <Route path="/seance/:seanceId/blocs" element={<BlocSeance/>}/>
+        <Route path="/creer-seance" element={<CreerSeance/>}/>
+        <Route path="/fin-seance/:seanceId" element={<FinSeance/>}/>
+        <Route path="/resultat_seance" element={<ResultatSeance/>}/>
+        <Route path="/save_seance" element={<SaveSeance/>}/>
+        <Route path="/seance/:seanceId/execute" element={<SeanceExo />} />
+
+        <Route path="/remplacerexo" element={<RemplacerExo/>}/>
+        <Route path="/exercice/:id" element={<ExercicePage />} />
+        <Route path="/exercices" element={<ExerciceProvider/>}/>
+        <Route path="/exo-search" element={<ExoSearch/>}/>
       </Routes>
+      </SeancesProvider>
+    </ExerciceProvider>
   );
 }
