@@ -1,52 +1,55 @@
 /* eslint-env serviceworker */
 /* eslint-disable no-restricted-globals */
 
-const CACHE_NAME = 'sport-app-v1';
+const CACHE_NAME = 'sport-app-v1.0.1';
+const RUNTIME_CACHE = 'sport-app-runtime-v1';
 
 const urlsToCache = [
   '/',
   '/index.html',
   '/manifest.json',
+  '/static/css/main.css',
+  '/static/js/main.js',
 ];
 
 self.addEventListener('install', (event) => {
-  console.log('[Service Worker] Installation...');
+  console.log('[SW] Installation...');
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
-        console.log('[Service Worker] Cache ouvert');
-        return cache.addAll(urlsToCache).catch((error) => {
-          console.error('[Service Worker] Erreur lors du cache initial:', error);
-          return Promise.resolve();
-        });
+        console.log('[SW] Mise en cache des fichiers essentiels');
+        return cache.addAll(urlsToCache.filter(url => url !== '/static/css/main.css' && url !== '/static/js/main.js'))
+          .catch((error) => {
+            console.warn('[SW] Erreur lors du cache initial (normal en dev):', error);
+            return Promise.resolve();
+          });
       })
       .then(() => {
-        console.log('[Service Worker] Installation terminée');
+        console.log('[SW] Installation terminée - activation forcée');
         return self.skipWaiting();
       })
   );
 });
 
 self.addEventListener('activate', (event) => {
-  console.log('[Service Worker] Activation...');
-  const cacheWhitelist = [CACHE_NAME];
+  console.log('[SW] Activation...');
+  const cacheWhitelist = [CACHE_NAME, RUNTIME_CACHE];
   
   event.waitUntil(
     caches.keys()
       .then((cacheNames) => {
         return Promise.all(
           cacheNames.map((cacheName) => {
-            if (cacheWhitelist.indexOf(cacheName) === -1) {
-              console.log('[Service Worker] Suppression ancien cache:', cacheName);
+            if (!cacheWhitelist.includes(cacheName)) {
+              console.log('[SW] Suppression ancien cache:', cacheName);
               return caches.delete(cacheName);
             }
-            // CORRECTION: Retourner undefined explicitement si on ne supprime pas
             return Promise.resolve();
           })
         );
       })
       .then(() => {
-        console.log('[Service Worker] Activation terminée');
+        console.log('[SW] Activation terminée - prise de contrôle');
         return self.clients.claim();
       })
   );
@@ -55,37 +58,37 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET' || 
       event.request.url.includes('/api/') ||
-      event.request.url.includes('chrome-extension://')) {
+      event.request.url.includes('chrome-extension://') ||
+      event.request.url.includes('sockjs-node')) {
     return;
   }
 
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        if (!response || response.status !== 200) {
-          return response;
-        }
-        if (response.type === 'basic' || response.type === 'cors') {
+        if (response && response.status === 200 && 
+            (response.type === 'basic' || response.type === 'cors')) {
           const responseToCache = response.clone();
 
-          caches.open(CACHE_NAME)
+          caches.open(RUNTIME_CACHE)
             .then((cache) => {
               cache.put(event.request, responseToCache);
             })
             .catch((error) => {
-              console.error('[Service Worker] Erreur mise en cache:', error);
+              console.error('[SW] Erreur mise en cache runtime:', error);
             });
         }
 
         return response;
       })
       .catch(() => {
-        console.log('[Service Worker] Réseau échoué, utilisation du cache pour:', event.request.url);
+        console.log('[SW] Réseau échoué, utilisation du cache pour:', event.request.url);
         return caches.match(event.request)
           .then((response) => {
             if (response) {
               return response;
             }
+            
             if (event.request.mode === 'navigate') {
               return caches.match('/index.html');
             }
@@ -94,7 +97,7 @@ self.addEventListener('fetch', (event) => {
               status: 503,
               statusText: 'Service indisponible',
               headers: new Headers({
-                'Content-Type': 'text/plain'
+                'Content-Type': 'text/plain; charset=utf-8'
               })
             });
           });
@@ -104,9 +107,9 @@ self.addEventListener('fetch', (event) => {
 
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
-    console.log('[Service Worker] SKIP_WAITING reçu');
+    console.log('[SW] SKIP_WAITING reçu');
     self.skipWaiting();
   }
 });
 
-console.log('[Service Worker] Chargé et prêt');
+console.log('[SW] Service Worker chargé et prêt');

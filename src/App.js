@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link as RouterLink, Routes, Route } from "react-router-dom";
+import { Snackbar, Alert, } from "@mui/material";
 import {
   Container,
   Box,
@@ -20,6 +21,8 @@ import {
 import { ExerciceProvider } from "./Données/exercices";
 import { SeancesProvider } from "./Données/seancepage";
 
+import CloseIcon from "@mui/icons-material/Close";
+import IosShareIcon from "@mui/icons-material/IosShare";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
@@ -124,12 +127,32 @@ function Login() {
     </Container>
   );
 }
-
-function InstallPWA() {
+export function InstallPWA() {
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [showInstallButton, setShowInstallButton] = useState(false);
+  const [showIOSPrompt, setShowIOSPrompt] = useState(false);
+  const [isInstalled, setIsInstalled] = useState(false);
 
   useEffect(() => {
+    if (window.matchMedia('(display-mode: standalone)').matches || 
+        window.navigator.standalone === true) {
+      console.log('[PWA] App déjà installée');
+      setIsInstalled(true);
+      return;
+    }
+
+    const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+    const isInStandaloneMode = window.navigator.standalone;
+
+    if (isIOS && !isInStandaloneMode) {
+      const hasSeenIOSPrompt = localStorage.getItem('ios-install-prompt-seen');
+      if (!hasSeenIOSPrompt) {
+        setTimeout(() => {
+          setShowIOSPrompt(true);
+        }, 3000); 
+      }
+    }
+
     const handleBeforeInstallPrompt = (e) => {
       console.log('[PWA] beforeinstallprompt déclenché');
       e.preventDefault();
@@ -139,10 +162,11 @@ function InstallPWA() {
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
 
-    if (window.matchMedia('(display-mode: standalone)').matches) {
-      console.log('[PWA] App déjà installée');
+    window.addEventListener('appinstalled', () => {
+      console.log('[PWA] App installée avec succès');
       setShowInstallButton(false);
-    }
+      setIsInstalled(true);
+    });
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
@@ -155,33 +179,88 @@ function InstallPWA() {
       return;
     }
 
+    console.log('[PWA] Affichage du prompt d\'installation');
     deferredPrompt.prompt();
+    
     const { outcome } = await deferredPrompt.userChoice;
     console.log(`[PWA] Choix utilisateur: ${outcome}`);
+    
+    if (outcome === 'accepted') {
+      console.log('[PWA] Installation acceptée');
+    } else {
+      console.log('[PWA] Installation refusée');
+    }
     
     setDeferredPrompt(null);
     setShowInstallButton(false);
   };
 
-  if (!showInstallButton) return null;
+  const handleCloseIOSPrompt = () => {
+    setShowIOSPrompt(false);
+    localStorage.setItem('ios-install-prompt-seen', 'true');
+  };
+
+  if (isInstalled) return null;
 
   return (
-    <Fab
-      color="primary"
-      aria-label="installer l'application"
-      onClick={handleInstallClick}
-      sx={{
-        position: 'fixed',
-        bottom: 16,
-        right: 16,
-        zIndex: 1300,
-      }}
-    >
-      <GetAppIcon />
-    </Fab>
+    <>
+      {/* Bouton flottant pour Android/Chrome */}
+      {showInstallButton && (
+        <Fab
+          color="primary"
+          aria-label="installer l'application"
+          onClick={handleInstallClick}
+          sx={{
+            position: 'fixed',
+            bottom: 16,
+            right: 16,
+            zIndex: 1300,
+          }}
+        >
+          <GetAppIcon />
+        </Fab>
+      )}
+
+      {/* Instructions pour iOS */}
+      <Snackbar
+        open={showIOSPrompt}
+        onClose={handleCloseIOSPrompt}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        sx={{ bottom: { xs: 90, sm: 24 } }}
+      >
+        <Alert
+          onClose={handleCloseIOSPrompt}
+          severity="info"
+          variant="filled"
+          sx={{ 
+            width: '100%', 
+            maxWidth: 400,
+            '& .MuiAlert-message': { width: '100%' }
+          }}
+          action={
+            <Button 
+              color="inherit" 
+              size="small" 
+              onClick={handleCloseIOSPrompt}
+            >
+              <CloseIcon />
+            </Button>
+          }
+        >
+          <Box>
+            <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
+              Installer l'application
+            </Typography>
+            <Typography variant="body2">
+              Appuyez sur <IosShareIcon sx={{ verticalAlign: 'middle', fontSize: 16 }} /> puis 
+              "Sur l'écran d'accueil"
+            </Typography>
+          </Box>
+        </Alert>
+      </Snackbar>
+    </>
   );
 }
-
 // Chemin Routes
 export default function App() {
   return (
