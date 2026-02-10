@@ -1,31 +1,14 @@
 {
   "name": "Sport App",
-  "short_name": "sportapp",
-  "description": "App",
+  "short_name": "SportApp",
+  "description": "Application de suivi sportif",
   "lang": "fr-FR",
-  "dir": "auto",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#2EC6FE",
   "theme_color": "#8936FF",
-  "screenshots": [
-    {
-      "src": "/screenshot1.png",
-      "sizes": "1457x1266",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "Vue desktop"
-    },
-    {
-      "src": "/screenshot2.png",
-      "sizes": "390x890",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Vue mobile"
-    }
-  ],
   "icons": [
     {
       "src": "/icon192_maskable.png",
