@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSwipeable } from 'react-swipeable'; 
 
 import {
   AppBar,
@@ -32,15 +31,6 @@ export default function Planning() {
   const [value, setValue] = useState(0);
   const [seancesCalendrier, setSeancesCalendrier] = useState({});
   const [slideIn] = useState(true);
-
-  const handlers = useSwipeable({
-    onSwipedLeft: () => navigate('/exo-search'),
-    onSwipedRight: () => navigate('/profile'),
-    trackTouch: true,
-    trackMouse: false,
-    delta: 80,
-    preventScrollOnSwipe: false,
-  });
 
   useEffect(() => {
     const loadSeances = () => {
@@ -89,7 +79,6 @@ export default function Planning() {
 
   return (
     <Box 
-      {...handlers}
       minHeight="100vh" 
       display="flex" 
       flexDirection="column"

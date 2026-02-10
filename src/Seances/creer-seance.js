@@ -45,6 +45,7 @@ import {
   Close,
   ExpandMore,
   Remove,
+  Edit,
 } from '@mui/icons-material';
 import { useExercices } from '../Données/exercices';
 
@@ -54,7 +55,6 @@ const CreerSeance = () => {
   const { exercices, searchExercices } = useExercices();
   
   const isMobile = useMediaQuery('(max-width:600px)');
-  const isTablet = useMediaQuery('(max-width:960px)');
   
   const seanceFromState = location.state?.seance;
   const dateKey = location.state?.dateKey;
@@ -103,6 +103,8 @@ const CreerSeance = () => {
   const [currentSectionId, setCurrentSectionId] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedExercices, setExpandedExercices] = useState({});
+  const [editingSectionId, setEditingSectionId] = useState(null);
+  const [editingSectionTitle, setEditingSectionTitle] = useState('');
 
   useEffect(() => {
     if (sessionData.autoSave && dateKey) {
@@ -347,6 +349,29 @@ const CreerSeance = () => {
     }]);
   };
 
+  const startEditingSectionTitle = (sectionId, currentTitle) => {
+    setEditingSectionId(sectionId);
+    setEditingSectionTitle(currentTitle);
+  };
+
+  const saveSectionTitle = (sectionId) => {
+    if (editingSectionTitle.trim()) {
+      setSections(sections.map(section => {
+        if (section.id === sectionId) {
+          return { ...section, title: editingSectionTitle.trim() };
+        }
+        return section;
+      }));
+    }
+    setEditingSectionId(null);
+    setEditingSectionTitle('');
+  };
+
+  const cancelEditingSectionTitle = () => {
+    setEditingSectionId(null);
+    setEditingSectionTitle('');
+  };
+
   const handleBack = () => {
     if (dateKey) {
       navigate(-1, {
@@ -541,7 +566,6 @@ const CreerSeance = () => {
                       <Card
                         ref={provided.innerRef}
                         {...provided.draggableProps}
-                        {...provided.dragHandleProps}
                         elevation={0}
                         sx={{
                           mb: 2,
@@ -561,45 +585,101 @@ const CreerSeance = () => {
                             flexWrap="wrap"
                             gap={1}
                           >
-                            <Stack direction="row" alignItems="center" spacing={{ xs: 1, sm: 2 }}>
-                              {!isMobile && (
-                                <Box
-                                  {...provided.dragHandleProps}
-                                  sx={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    width: 32,
-                                    height: 32,
-                                    cursor: 'grab',
-                                    '&:active': { cursor: 'grabbing' },
+                            <Stack direction="row" alignItems="center" spacing={{ xs: 1, sm: 2 }} sx={{ flex: 1, minWidth: 0 }}>
+                              {/* Icône drag avec points - visible sur mobile et desktop */}
+                              <Box
+                                {...provided.dragHandleProps}
+                                sx={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  width: { xs: 28, sm: 32 },
+                                  height: { xs: 28, sm: 32 },
+                                  cursor: 'grab',
+                                  '&:active': { cursor: 'grabbing' },
+                                  touchAction: 'none',
+                                  flexShrink: 0,
+                                }}
+                              >
+                                <Box sx={{
+                                  width: { xs: 3, sm: 4 }, 
+                                  height: { xs: 3, sm: 4 }, 
+                                  borderRadius: '50%', 
+                                  bgcolor: '#bdbdbd',
+                                  position: 'relative',
+                                  '&::before, &::after': {
+                                    content: '""', 
+                                    position: 'absolute',
+                                    width: { xs: 3, sm: 4 }, 
+                                    height: { xs: 3, sm: 4 }, 
+                                    borderRadius: '50%', 
+                                    bgcolor: '#bdbdbd',
+                                  },
+                                  '&::before': { top: { xs: -6, sm: -8 } },
+                                  '&::after': { top: { xs: 6, sm: 8 } },
+                                }} />
+                                <Box sx={{
+                                  width: { xs: 3, sm: 4 }, 
+                                  height: { xs: 3, sm: 4 }, 
+                                  borderRadius: '50%', 
+                                  bgcolor: '#bdbdbd',
+                                  position: 'relative', 
+                                  ml: 0.5,
+                                  '&::before, &::after': {
+                                    content: '""', 
+                                    position: 'absolute',
+                                    width: { xs: 3, sm: 4 }, 
+                                    height: { xs: 3, sm: 4 }, 
+                                    borderRadius: '50%', 
+                                    bgcolor: '#bdbdbd',
+                                  },
+                                  '&::before': { top: { xs: -6, sm: -8 } },
+                                  '&::after': { top: { xs: 6, sm: 8 } },
+                                }} />
+                              </Box>
+                              
+                              {editingSectionId === section.id ? (
+                                <TextField
+                                  autoFocus
+                                  value={editingSectionTitle}
+                                  onChange={(e) => setEditingSectionTitle(e.target.value)}
+                                  onBlur={() => saveSectionTitle(section.id)}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                      saveSectionTitle(section.id);
+                                    } else if (e.key === 'Escape') {
+                                      cancelEditingSectionTitle();
+                                    }
                                   }}
-                                >
-                                  <Box sx={{
-                                    width: 4, height: 4, borderRadius: '50%', bgcolor: '#bdbdbd',
-                                    position: 'relative',
-                                    '&::before, &::after': {
-                                      content: '""', position: 'absolute',
-                                      width: 4, height: 4, borderRadius: '50%', bgcolor: '#bdbdbd',
+                                  variant="standard"
+                                  size="small"
+                                  sx={{
+                                    flex: 1,
+                                    '& .MuiInputBase-input': {
+                                      fontSize: { xs: '1rem', sm: '1.25rem' },
+                                      fontWeight: 600,
+                                      padding: 0,
                                     },
-                                    '&::before': { top: -8 },
-                                    '&::after': { top: 8 },
-                                  }} />
-                                  <Box sx={{
-                                    width: 4, height: 4, borderRadius: '50%', bgcolor: '#bdbdbd',
-                                    position: 'relative', ml: 0.5,
-                                    '&::before, &::after': {
-                                      content: '""', position: 'absolute',
-                                      width: 4, height: 4, borderRadius: '50%', bgcolor: '#bdbdbd',
-                                    },
-                                    '&::before': { top: -8 },
-                                    '&::after': { top: 8 },
-                                  }} />
-                                </Box>
+                                  }}
+                                />
+                              ) : (
+                                <Stack direction="row" alignItems="center" spacing={0.5} sx={{ flex: 1, minWidth: 0 }}>
+                                  <Typography variant="h6" fontWeight={600} sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }} noWrap>
+                                    #{index + 1} - {section.title}
+                                  </Typography>
+                                  <IconButton
+                                    size="small"
+                                    onClick={() => startEditingSectionTitle(section.id, section.title)}
+                                    sx={{ 
+                                      color: '#666',
+                                      opacity: 0.6,
+                                      '&:hover': { opacity: 1 },
+                                    }}
+                                  >
+                                    <Edit fontSize="small" />
+                                  </IconButton>
+                                </Stack>
                               )}
-                              <Typography variant="h6" fontWeight={600} sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}>
-                                #{index + 1} - {section.title}
-                              </Typography>
                             </Stack>
 
                             <Stack direction="row" spacing={0.5}>
@@ -687,41 +767,6 @@ const CreerSeance = () => {
                                             alignItems="center"
                                             spacing={{ xs: 1, sm: 2 }}
                                           >
-                                            {!isMobile && (
-                                              <Box
-                                                sx={{
-                                                  display: 'flex',
-                                                  alignItems: 'center',
-                                                  justifyContent: 'center',
-                                                  width: 24,
-                                                  height: 24,
-                                                  cursor: 'grab',
-                                                  '&:active': { cursor: 'grabbing' },
-                                                }}
-                                              >
-                                                <Box
-                                                  sx={{
-                                                    display: 'grid',
-                                                    gridTemplateColumns: 'repeat(2, 4px)',
-                                                    gridTemplateRows: 'repeat(3, 4px)',
-                                                    gap: '4px',
-                                                  }}
-                                                >
-                                                  {[...Array(6)].map((_, i) => (
-                                                    <Box
-                                                      key={i}
-                                                      sx={{
-                                                        width: 4,
-                                                        height: 4,
-                                                        borderRadius: '50%',
-                                                        bgcolor: '#bdbdbd',
-                                                      }}
-                                                    />
-                                                  ))}
-                                                </Box>
-                                              </Box>
-                                            )}
-
                                             <Box
                                               component="img"
                                               src={exercices.image}

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useSwipeable } from 'react-swipeable'; 
 import {
   AppBar,
   Slide,
@@ -29,38 +28,6 @@ export default function SeanceDetail() {
   const { seanceId } = useParams();
   
   const [seance, setSeance] = useState(null);
-  
-  const scrollLock = React.useRef(false);
-  const [isNavigating, setIsNavigating] = React.useState(false);
-  const handleWheel = (e) => {
-    if (scrollLock.current || isNavigating) return;
-
-    const absX = Math.abs(e.deltaX);
-    const absY = Math.abs(e.deltaY);
-
-    if (absX > absY && absX > 60) {
-      scrollLock.current = true;
-
-      setIsNavigating(true);
-      setTimeout(() => {
-      if (e.deltaX > 0) {
-        navigate(`/seance/${seanceId}/blocs`);
-      } else {
-        navigate('/planning');
-      }
-      }, 100)
-    }
-  };
-
-  const navigateWithReset = (path) => {
-    scrollLock.current = false;  
-    navigate(path);
-  };
-
-  const handlers = useSwipeable({
-    onSwipedLeft: () => navigateWithReset(`/seance/${seanceId}/blocs`),
-    onSwipedRight: () => navigateWithReset('/Planning'),
-  });
 
   useEffect(() => {
     if (location.state?.seance) {
@@ -182,8 +149,6 @@ export default function SeanceDetail() {
       <Toolbar disableGutters sx={{ position: 'relative', height: 350 }}>
         <Slide direction="right" in={slideIn} timeout={300}>
           <Card
-            {...handlers}
-            onWheel={handleWheel} 
             sx={{ 
               width: '100%', 
               height: '100%' 
@@ -207,8 +172,6 @@ export default function SeanceDetail() {
       </Toolbar>
       <Slide direction="right" in={slideIn} timeout={300}>
         <Box
-          {...handlers}
-          onWheel={handleWheel}
           sx={{
             p: 2,
             display: 'flex',

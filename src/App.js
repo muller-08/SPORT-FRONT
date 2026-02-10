@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link as RouterLink, Routes, Route } from "react-router-dom";
 import {
   Container,
@@ -14,6 +14,7 @@ import {
   InputAdornment,
   IconButton,
   Link,
+  Fab,
 } from "@mui/material";
 
 import { ExerciceProvider } from "./Données/exercices";
@@ -22,6 +23,7 @@ import { SeancesProvider } from "./Données/seancepage";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import GetAppIcon from "@mui/icons-material/GetApp";
 
 //Routes
 import ForgotPassword from "./Connexion/forgot-psw";
@@ -56,7 +58,6 @@ function Login() {
     e.preventDefault();
     console.log(email, password);
   };
-
 
   //Boîtes formulaires
   return (
@@ -124,37 +125,95 @@ function Login() {
   );
 }
 
+function InstallPWA() {
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [showInstallButton, setShowInstallButton] = useState(false);
+
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e) => {
+      console.log('[PWA] beforeinstallprompt déclenché');
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setShowInstallButton(true);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      console.log('[PWA] App déjà installée');
+      setShowInstallButton(false);
+    }
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) {
+      console.log('[PWA] Pas de prompt disponible');
+      return;
+    }
+
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    console.log(`[PWA] Choix utilisateur: ${outcome}`);
+    
+    setDeferredPrompt(null);
+    setShowInstallButton(false);
+  };
+
+  if (!showInstallButton) return null;
+
+  return (
+    <Fab
+      color="primary"
+      aria-label="installer l'application"
+      onClick={handleInstallClick}
+      sx={{
+        position: 'fixed',
+        bottom: 16,
+        right: 16,
+        zIndex: 1300,
+      }}
+    >
+      <GetAppIcon />
+    </Fab>
+  );
+}
+
 // Chemin Routes
 export default function App() {
   return (
     <ExerciceProvider>
       <SeancesProvider>
-      <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/forgot-psw" element={<ForgotPassword />} />
-        <Route path="/register" element={<Register />} />
+        <InstallPWA />
+        <Routes>
+          <Route path="/" element={<Login />} />
+          <Route path="/forgot-psw" element={<ForgotPassword />} />
+          <Route path="/register" element={<Register />} />
 
-        <Route path="/planning" element={<Planning/>} />
-        <Route path="/exo-act" element={<ExoAct/>}/>
-        <Route path="/calendrier" element={<Calendrier/>}/>
-        <Route path="/notifs" element={<Notifs/>}/>
-        <Route path="/seance/:seanceId/" element={<Seance/>} />
-        
-        <Route path="/profile" element={<Profile/>}/>
-        <Route path="/profile-settings" element={<ProfileSettings/>}/>
+          <Route path="/planning" element={<Planning/>} />
+          <Route path="/exo-act" element={<ExoAct/>}/>
+          <Route path="/calendrier" element={<Calendrier/>}/>
+          <Route path="/notifs" element={<Notifs/>}/>
+          <Route path="/seance/:seanceId/" element={<Seance/>} />
+          
+          <Route path="/profile" element={<Profile/>}/>
+          <Route path="/profile-settings" element={<ProfileSettings/>}/>
 
-        <Route path="/seance/:seanceId/blocs" element={<BlocSeance/>}/>
-        <Route path="/creer-seance" element={<CreerSeance/>}/>
-        <Route path="/fin-seance/:seanceId" element={<FinSeance/>}/>
-        <Route path="/resultat_seance" element={<ResultatSeance/>}/>
-        <Route path="/save_seance" element={<SaveSeance/>}/>
-        <Route path="/seance/:seanceId/execute" element={<SeanceExo />} />
+          <Route path="/seance/:seanceId/blocs" element={<BlocSeance/>}/>
+          <Route path="/creer-seance" element={<CreerSeance/>}/>
+          <Route path="/fin-seance/:seanceId" element={<FinSeance/>}/>
+          <Route path="/resultat_seance" element={<ResultatSeance/>}/>
+          <Route path="/save_seance" element={<SaveSeance/>}/>
+          <Route path="/seance/:seanceId/execute" element={<SeanceExo />} />
 
-        <Route path="/remplacerexo" element={<RemplacerExo/>}/>
-        <Route path="/exercice/:id" element={<ExercicePage />} />
-        <Route path="/exercices" element={<ExerciceProvider/>}/>
-        <Route path="/exo-search" element={<ExoSearch/>}/>
-      </Routes>
+          <Route path="/remplacerexo" element={<RemplacerExo/>}/>
+          <Route path="/exercice/:id" element={<ExercicePage />} />
+          <Route path="/exercices" element={<ExerciceProvider/>}/>
+          <Route path="/exo-search" element={<ExoSearch/>}/>
+        </Routes>
       </SeancesProvider>
     </ExerciceProvider>
   );

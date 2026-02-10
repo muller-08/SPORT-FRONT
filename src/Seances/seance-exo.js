@@ -1,5 +1,4 @@
 import * as React from "react";
-import { useSwipeable } from 'react-swipeable'; 
 import {
   Slide,
   Box,
@@ -57,8 +56,6 @@ export default function SeanceExecute() {
   const [slideIn] = useState(true);
   const [timer, setTimer] = useState(0);
 
-  const allExercices = seance?.sections?.flatMap(section => section.exercices || []) || [];
-  
   const [cards, setCards] = useState([]);
   const [originalCards, setOriginalCards] = useState([]);
 
@@ -234,7 +231,6 @@ export default function SeanceExecute() {
       setCurrentEdit({ cardId, setIndex });
 
       const existingPerf = card.performances?.find(p => p.setIndex === setIndex);
-      const prescribedSerie = card.series?.[setIndex];
       
       setReps(existingPerf?.reps || 0);
       setPoids(existingPerf?.poids || 0);

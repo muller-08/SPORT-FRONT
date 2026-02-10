@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   Box,
   Button,
@@ -34,7 +34,11 @@ export default function FinSeance() {
 
   const sessionTimer = location.state?.sessionTimer || 0;
   const coachNote = location.state?.coachNote || '';
-  const performances = location.state?.performances || [];
+  
+  const performances = useMemo(
+    () => location.state?.performances || [],
+    [location.state?.performances]
+  );
 
   const fatigueOptions = ['Fatigué', 'En forme', 'Très en forme'];
   const difficulteOptions = ['Facile', 'Moyenne', 'Difficile'];
@@ -84,12 +88,10 @@ export default function FinSeance() {
         const calendarSeances = JSON.parse(saved);
         
         let seanceToUpdate = null;
-        let dateKeyFound = null;
         
         for (const dateKey in calendarSeances) {
           const seanceIndex = calendarSeances[dateKey].findIndex(s => s.id === parseInt(seanceId));
           if (seanceIndex !== -1) {
-            dateKeyFound = dateKey;
             seanceToUpdate = calendarSeances[dateKey][seanceIndex];
             calendarSeances[dateKey][seanceIndex] = {
               ...seanceToUpdate,
@@ -110,7 +112,6 @@ export default function FinSeance() {
             };
             
             notifySeanceCompleted(seanceToUpdate.title, stats);
-            
             break;
           }
         }

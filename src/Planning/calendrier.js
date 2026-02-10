@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useSwipeable } from 'react-swipeable';
 import {
   AppBar,
   Toolbar,
@@ -36,35 +35,6 @@ export default function CalendarList() {
   const seanceRefs = useRef({});
   const observerRef = useRef(null);
   const [slideIn] = useState(true);
-
-  const scrollLock = React.useRef(false);
-  const [isNavigating, setIsNavigating] = React.useState(false);
-  const handleWheel = (e) => {
-    if (scrollLock.current || isNavigating) return;
-
-    const absX = Math.abs(e.deltaX);
-    const absY = Math.abs(e.deltaY);
-
-    if (absX > absY && absX > 60) {
-      scrollLock.current = true;
-
-      setIsNavigating(true);
-      setTimeout(() => {
-      if (e.deltaX > 0) {
-        navigate('/planning');
-      }
-      }, 100)
-    }
-  };
-
-  const navigateWithReset = (path) => {
-    scrollLock.current = false;  
-    navigate(path);
-  };
-
-  const handlers = useSwipeable({
-    onSwipedRight: () => navigateWithReset('/planning'),
-  });
 
   const [seancesParJour, setSeancesParJour] = useState(() => {
     try {
@@ -228,8 +198,6 @@ const handleDeleteAllStorage = () => {
 
   return (
     <Box 
-    {...handlers}
-    onWheel={handleWheel}
     sx={{ minHeight: '100vh', bgcolor: '#fff' }}>
       <AppBar position="fixed" sx={{ bgcolor: '#fff', color: '#000', boxShadow: 0 }}>
         <Toolbar>

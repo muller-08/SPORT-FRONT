@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useSwipeable } from 'react-swipeable';
 import { useNavigate } from "react-router-dom";
 
 import Typography from '@mui/joy/Typography';
@@ -31,14 +30,6 @@ export default function ProfileSettings() {
     localStorage.setItem('notificationsEnabled', JSON.stringify(notificationsEnabled));
   }, [notificationsEnabled]);
 
-  const handlers = useSwipeable({
-    onSwipedRight: () => navigate('/profile'),
-    trackTouch: true,
-    trackMouse: false,
-    delta: 80,
-    preventScrollOnSwipe: false,
-  });
-
   const Item = styled(Paper)(({ theme }) => ({
     backgroundColor: '#fff',
     ...theme.typography.body2,
@@ -55,8 +46,7 @@ export default function ProfileSettings() {
   };
 
   return (
-    <Box 
-      {...handlers} 
+    <Box  
       sx={{ 
         width: '100%', 
         position: 'relative', 

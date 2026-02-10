@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useSwipeable } from 'react-swipeable'; 
 import {
   Card,
   CardHeader,
@@ -26,35 +25,6 @@ export default function BlocSeance() {
   const location = useLocation();
   const { seanceId } = useParams();
   const [seance, setSeance] = useState(null);
-
-  const scrollLock = React.useRef(false);
-
-  const [isNavigating, setIsNavigating] = React.useState(false);
-  const handleWheel = (e) => {
-    if (scrollLock.current || isNavigating) return;
-
-    const absX = Math.abs(e.deltaX);
-    const absY = Math.abs(e.deltaY);
-
-    if (absX > absY && absX > 60) {
-      scrollLock.current = true;
-
-      setIsNavigating(true);
-      setTimeout(() => {
-      if (e.deltaX > 0) {
-        navigate(`/seance/${seance.id}`);
-      }
-      }, 100)
-    }
-  };
-  const navigateWithReset = (path) => {
-    scrollLock.current = false;  
-    navigate(path);
-  };
-
-  const handlers = useSwipeable({
-    onSwipedRight: () => navigateWithReset(`/seance/${seance.id}`),
-  });
 
   useEffect(() => {
     if (location.state?.seance) {
@@ -132,8 +102,6 @@ export default function BlocSeance() {
   return (
     <>
       <AppBar
-        {...handlers}
-        onWheel={handleWheel}
         position="fixed" sx={{ backgroundColor: '#fff', boxShadow: 1 }}>
         <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Box          
@@ -152,8 +120,6 @@ export default function BlocSeance() {
 
       <Slide direction="right" in={slideIn} timeout={300}>
         <Box
-          {...handlers}
-          onWheel={handleWheel}
           sx={{
             display: 'flex',
             flexDirection: 'column',
@@ -177,8 +143,6 @@ export default function BlocSeance() {
 
             return (
               <Card 
-                {...handlers}
-                onWheel={handleWheel}
                 onClick={() => handleStartBlock(section.id)}
                 key={section.id}
                 variant="outlined" 
@@ -197,8 +161,6 @@ export default function BlocSeance() {
                 }}
               >
                 <Box
-                {...handlers}
-                onWheel={handleWheel}
                 sx={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
                   <CardHeader 
                     onClick={() => handleStartBlock(section.id)}

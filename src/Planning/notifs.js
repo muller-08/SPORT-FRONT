@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import Button from '@mui/joy/Button';
 import Typography from '@mui/joy/Typography';
 import Box from "@mui/joy/Box";
-import { useSwipeable } from 'react-swipeable';
 import { 
   Dialog, 
   DialogTitle, 
@@ -36,8 +35,6 @@ export default function Notif() {
   const [slideIn] = useState(true);
   const [notifications, setNotifications] = useState([]);
 
-  const scrollLock = React.useRef(false);
-
   useEffect(() => {
     loadNotifications();
   }, []);
@@ -46,47 +43,6 @@ export default function Notif() {
     const notifs = getNotifications();
     setNotifications(notifs);
   };
-
-  const [isNavigating, setIsNavigating] = React.useState(false);
-  const handleWheel = (e) => {
-    if (scrollLock.current || isNavigating) return;
-
-    const absX = Math.abs(e.deltaX);
-    const absY = Math.abs(e.deltaY);
-
-    if (absX > absY && absX > 60) {
-      scrollLock.current = true;
-
-      setIsNavigating(true);
-      setTimeout(() => {
-      if (e.deltaX > 0) {
-        navigate('/planning');
-      } 
-      }, 100)
-    }
-  };
-
-  useEffect(() => {
-    const reset = () => {
-      scrollLock.current = false;
-    };
-
-    window.addEventListener('wheel', reset);
-
-    return () => window.removeEventListener('wheel', reset);
-  }, []);
-
-  const navigateWithReset = (path) => {
-    scrollLock.current = false;  
-    navigate(path);
-  };
-
-  const handlers = useSwipeable({
-    onSwipedRight: () => navigateWithReset('/planning'),
-    preventScrollOnSwipe: false,
-    trackMouse: true,
-    delta: 80,
-  });
 
   const handleOpenDialog = () => {
     setNotifsDialogOpen(true);
@@ -156,8 +112,6 @@ export default function Notif() {
 
   return (
     <Box 
-      {...handlers}
-      onWheel={handleWheel}
       sx={{ width: '100%', position: 'relative', minHeight: '100vh', pb: 4 }}
     >
       <AppBar position="fixed" sx={{ backgroundColor: '#fff', boxShadow: 0 }}>

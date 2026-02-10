@@ -6,7 +6,6 @@ import Slide from '@mui/material/Slide';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import { useNavigate } from "react-router-dom";
-import { useSwipeable } from 'react-swipeable';
 import BottomNavigation  from '@mui/material/BottomNavigation';
 import BottomNavigationAction from '@mui/material/BottomNavigationAction';
 import Paper from '@mui/material/Paper';
@@ -29,36 +28,6 @@ export default function GradientCover() {
   const navigate = useNavigate();
   const [slideIn] = useState(true);
   const [value, setValue] = React.useState(3);
-
-  const scrollLock = React.useRef(false);
-  const [isScrolling, setIsScrolling] = useState(false);
-
-  const handleWheel = (e) => {
-    e.preventDefault();
-    if (isScrolling) return;
-
-    if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-      if (e.deltaX > 60) {
-        setIsScrolling(true);
-        navigate('/profile-settings');
-      } else if (e.deltaX < -60) {
-        setIsScrolling(true);
-        navigate('/exo-search');
-      }
-
-      setTimeout(() => setIsScrolling(false), 600);
-    }
-  };
-
-  const navigateWithReset = (path) => {
-    scrollLock.current = false;  
-    navigate(path);
-  };
-
-  const handlers = useSwipeable({
-    onSwipedLeft: () => navigateWithReset('/profile-settings'),
-    onSwipedRight: () => navigateWithReset('/exo-search'),
-  });
 
   const Item = styled(Paper)(({ theme }) => ({
     backgroundColor: '#fff',
@@ -86,8 +55,6 @@ export default function GradientCover() {
 
   return (
     <Box 
-      {...handlers}
-      onWheel={handleWheel}
       sx={{ 
         width: '100%', 
         position: 'relative', 

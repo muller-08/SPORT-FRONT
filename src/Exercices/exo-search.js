@@ -12,7 +12,6 @@ import {
 } from '@mui/material';
 import { Card } from '@mui/joy';
 import { useNavigate } from 'react-router-dom';
-import { useSwipeable } from 'react-swipeable';
 import CardMedia from '@mui/material/CardMedia';
 import CardActionArea from '@mui/material/CardActionArea';
 
@@ -35,47 +34,12 @@ export default function ListAct() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const scrollLock = React.useRef(false);
-  const [isNavigating, setIsNavigating] = React.useState(false);
-  const handleWheel = (e) => {
-    if (scrollLock.current || isNavigating) return;
-
-    const absX = Math.abs(e.deltaX);
-    const absY = Math.abs(e.deltaY);
-
-    if (absX > absY && absX > 60) {
-            e.preventDefault();
-      scrollLock.current = true;
-
-      setIsNavigating(true);
-      setTimeout(() => {
-      if (e.deltaX > 0) {
-        navigate('/profile');
-      } else {
-        navigate('/planning');
-      }
-      }, 100)
-    }
-  };
-
-  const navigateWithReset = (path) => {
-    scrollLock.current = false;  
-    navigate(path);
-  };
-
-  const handlers = useSwipeable({
-    onSwipedLeft: () => navigateWithReset('/profile'),
-    onSwipedRight: () => navigateWithReset('/planning'),
-  });
-
   const filteredExercice = exercices.filter((ex) =>
     ex.title.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
     <Box 
-      {...handlers}
-      onWheel={handleWheel}
       sx={{ 
         minHeight: '100vh',
         touchAction: 'pan-y',
