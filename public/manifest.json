@@ -3,6 +3,7 @@
   "short_name": "SportApp",
   "description": "Application de suivi sportif",
   "lang": "fr-FR",
+  "id": "/",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

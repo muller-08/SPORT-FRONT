@@ -31,6 +31,19 @@ if ('serviceWorker' in navigator) {
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker
+      .register('/service-worker.js')
+      .then((registration) => {
+        console.log('[SW] ✅ Service Worker enregistré avec succès:', registration.scope);
+      })
+      .catch((error) => {
+        console.error('[SW] ❌ Échec enregistrement Service Worker:', error);
+      });
+  });
+}
+
 root.render(
   <React.StrictMode>
     <BrowserRouter>
@@ -38,6 +51,19 @@ root.render(
     </BrowserRouter>
   </React.StrictMode>
 );
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker
+      .register('/service-worker.js')
+      .then((registration) => {
+        console.log(' SW enregistré:', registration.scope);
+      })
+      .catch((error) => {
+        console.error(' SW erreur:', error);
+      });
+  });
+}
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
