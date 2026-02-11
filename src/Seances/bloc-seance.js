@@ -28,7 +28,7 @@ export default function BlocSeance() {
   const [seance, setSeance] = useState(null);
 
   const handlers = useSwipeable({
-    onSwipedRight: () => navigate('/profile'),
+    onSwipedRight: () => navigate(-1),
     trackTouch: true,
     trackMouse: false,
     delta: 80,
