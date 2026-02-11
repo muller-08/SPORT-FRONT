@@ -127,6 +127,11 @@ function Login() {
     </Container>
   );
 }
+
+export const metadata = {
+  manifest: 'data:application/manifest+json;base64,eyJ0eXBlIjog...base64_content...'
+};   
+
 export function InstallPWA() {
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [showInstallButton, setShowInstallButton] = useState(false);
