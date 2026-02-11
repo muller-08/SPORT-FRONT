@@ -563,7 +563,7 @@ const CreerSeance = () => {
 
           <Droppable droppableId="sections">
             {(provided) => (
-             <Box 
+             <Box
                 {...provided.droppableProps}
                 ref={provided.innerRef}
               >
@@ -584,7 +584,6 @@ const CreerSeance = () => {
                           borderRadius: 2,
                           bgcolor: snapshot.isDragging ? '#f0f4ff' : 'white',
                           boxShadow: snapshot.isDragging ? '0 8px 16px rgba(0,0,0,0.15)' : 'none',
-                          touchAction: 'none',
                         }}
                       >
                         <CardContent sx={{ p: { xs: 1.5, sm: 2 } }}>
@@ -805,7 +804,6 @@ const CreerSeance = () => {
                                                   variant="body1" 
                                                   fontWeight={600}
                                                   sx={{ 
-                                                    overflow: 'hidden',
                                                     textOverflow: 'ellipsis',
                                                     whiteSpace: 'nowrap',
                                                     fontSize: { xs: '0.9rem', sm: '1rem' },
