@@ -4,6 +4,8 @@ import { BrowserRouter } from 'react-router-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import * as serviceWorkerRegistration from './serviceWorkerRegistration';
+
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
@@ -51,6 +53,8 @@ root.render(
     </BrowserRouter>
   </React.StrictMode>
 );
+
+serviceWorkerRegistration.register();
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
