@@ -1,5 +1,6 @@
 /* eslint-env serviceworker */
 /* eslint-disable no-restricted-globals */
+
 const CACHE_NAME = 'sport-app-v1';
 const urlsToCache = [
   '/',
