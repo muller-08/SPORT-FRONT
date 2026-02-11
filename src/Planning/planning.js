@@ -12,6 +12,7 @@ import {
   Paper,
   Slide,
 } from '@mui/material';
+import { useSwipeable } from 'react-swipeable'; 
 
 import Card from '@mui/joy/Card';
 import CardCover from '@mui/joy/CardCover';
@@ -21,7 +22,6 @@ import Box from '@mui/joy/Box';
 
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
-import BlenderIcon from '@mui/icons-material/Blender';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import EventIcon from '@mui/icons-material/Event';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
@@ -31,6 +31,21 @@ export default function Planning() {
   const [value, setValue] = useState(0);
   const [seancesCalendrier, setSeancesCalendrier] = useState({});
   const [slideIn] = useState(true);
+
+  const handlers = useSwipeable({
+    onSwipedLeft: () => navigate('/exo-search'),
+    onSwipedRight: () => navigate('/profile'),
+    trackTouch: true,
+    trackMouse: false,
+    delta: 80,
+    preventScrollOnSwipe: false,
+  });
+
+  const seanceHandlers = useSwipeable({
+    onSwiping: (e) => e.event.stopPropagation(),
+    trackTouch: true,
+    preventScrollOnSwipe: false,
+  });
 
   useEffect(() => {
     const loadSeances = () => {
@@ -79,6 +94,7 @@ export default function Planning() {
 
   return (
     <Box 
+      {...handlers}
       minHeight="100vh" 
       display="flex" 
       flexDirection="column"
@@ -130,6 +146,7 @@ export default function Planning() {
           </Box>
         ) : (
           <Box
+            {...seanceHandlers}
             sx={{
               mb: 2,
               px: 2,
@@ -283,13 +300,12 @@ export default function Planning() {
           value={value}
           onChange={(event, newValue) => {
             setValue(newValue);
-            const routes = ['/planning', '/exo-search', '/recettes', '/profile'];
+            const routes = ['/planning', '/exo-search', '/profile'];
             navigate(routes[newValue]);
           }}
         >
           <BottomNavigationAction label="Planning" icon={<DashboardIcon />} />
           <BottomNavigationAction label="Exercices" icon={<FitnessCenterIcon />} />
-          <BottomNavigationAction label="Recettes" icon={<BlenderIcon />} />
           <BottomNavigationAction label="Profile" icon={<PersonOutlineIcon />} />
         </BottomNavigation>
       </Paper>

@@ -13,6 +13,7 @@ import {
   Slide,
   Badge,
 } from '@mui/material';
+import { useSwipeable } from 'react-swipeable'; 
 import { useNavigate } from "react-router-dom";
 import { IconButton } from '@mui/material';
 
@@ -34,6 +35,15 @@ export default function Notif() {
   const [notifsDialogOpen, setNotifsDialogOpen] = useState(false);
   const [slideIn] = useState(true);
   const [notifications, setNotifications] = useState([]);
+
+  const handlers = useSwipeable({
+    onSwipedRight: () => navigate('/planning'),
+    trackTouch: true,
+    trackMouse: false,
+    delta: 80,
+    preventScrollOnSwipe: false,
+  });
+
 
   useEffect(() => {
     loadNotifications();
@@ -111,7 +121,7 @@ export default function Notif() {
   const readNotifications = notifications.filter(n => n.read);
 
   return (
-    <Box 
+    <Box {...handlers}
       sx={{ width: '100%', position: 'relative', minHeight: '100vh', pb: 4 }}
     >
       <AppBar position="fixed" sx={{ backgroundColor: '#fff', boxShadow: 0 }}>

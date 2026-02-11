@@ -14,11 +14,11 @@ import { Card } from '@mui/joy';
 import { useNavigate } from 'react-router-dom';
 import CardMedia from '@mui/material/CardMedia';
 import CardActionArea from '@mui/material/CardActionArea';
+import { useSwipeable } from 'react-swipeable'; 
 
 import SearchIcon from '@mui/icons-material/Search';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
-import BlenderIcon from '@mui/icons-material/Blender';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 
 import { useExercices } from '../Données/exercices';
@@ -38,8 +38,17 @@ export default function ListAct() {
     ex.title.toLowerCase().includes(search.toLowerCase())
   );
 
+  const handlers = useSwipeable({
+    onSwipedLeft: () => navigate('/profile'),
+    onSwipedRight: () => navigate('/planning'),
+    trackTouch: true,
+    trackMouse: false,
+    delta: 80,
+    preventScrollOnSwipe: false,
+  });
+
   return (
-    <Box 
+    <Box {...handlers}
       sx={{ 
         minHeight: '100vh',
         touchAction: 'pan-y',
@@ -143,13 +152,12 @@ export default function ListAct() {
           value={value}
           onChange={(event, newValue) => {
             setValue(newValue);
-            const routes = ['/planning', '/exo-search', '/recettes', '/profile'];
+            const routes = ['/planning', '/exo-search', '/profile'];
             navigate(routes[newValue]);
           }}
         >
           <BottomNavigationAction label="Planning" icon={<DashboardIcon />} />
           <BottomNavigationAction label="Exercices" icon={<FitnessCenterIcon />} />
-          <BottomNavigationAction label="Recettes" icon={<BlenderIcon />} />
           <BottomNavigationAction label="Profile" icon={<PersonOutlineIcon />} />
         </BottomNavigation>
       </Paper>

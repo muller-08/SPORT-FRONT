@@ -10,6 +10,7 @@ import {
   Chip,
   Stack,
 } from '@mui/material';
+import { useSwipeable } from 'react-swipeable'; 
 import { Card } from '@mui/joy';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 
@@ -28,6 +29,15 @@ export default function SeanceDetail() {
   const { seanceId } = useParams();
   
   const [seance, setSeance] = useState(null);
+
+  const handlers = useSwipeable({
+    onSwipedRight: () => navigate('/planning'),
+    trackTouch: true,
+    trackMouse: false,
+    delta: 80,
+    preventScrollOnSwipe: false,
+  });
+
 
   useEffect(() => {
     if (location.state?.seance) {
@@ -138,7 +148,7 @@ export default function SeanceDetail() {
   };
 
   return (
-    <>
+    <Box {...handlers}>
     <AppBar position="fixed" sx={{ backgroundColor: '#fff', boxShadow: 1 }}>
       <Toolbar disableGutters sx={{ position: 'relative', height: 50 }}>
         <IconButton onClick={() => navigate("/planning")}>
@@ -148,7 +158,7 @@ export default function SeanceDetail() {
     </AppBar>
       <Toolbar disableGutters sx={{ position: 'relative', height: 350 }}>
         <Slide direction="right" in={slideIn} timeout={300}>
-          <Card
+          <Card 
             sx={{ 
               width: '100%', 
               height: '100%' 
@@ -171,7 +181,7 @@ export default function SeanceDetail() {
         </Slide>
       </Toolbar>
       <Slide direction="right" in={slideIn} timeout={300}>
-        <Box
+        <Box 
           sx={{
             p: 2,
             display: 'flex',
@@ -302,6 +312,6 @@ export default function SeanceDetail() {
           ))}
         </Box>
       </Slide>
-    </>
+    </Box>
   );
 }

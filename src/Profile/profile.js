@@ -9,20 +9,22 @@ import { useNavigate } from "react-router-dom";
 import BottomNavigation  from '@mui/material/BottomNavigation';
 import BottomNavigationAction from '@mui/material/BottomNavigationAction';
 import Paper from '@mui/material/Paper';
+import { useSwipeable } from 'react-swipeable'; 
+
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
-import BlenderIcon from '@mui/icons-material/Blender';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
+import EmojiEventsOutlinedIcon from '@mui/icons-material/EmojiEventsOutlined';
+import DirectionsRunIcon from '@mui/icons-material/DirectionsRun';
 import { IconButton } from '@mui/material';
+
 import Grid from '@mui/material/Grid';
 import { styled } from '@mui/material/styles';
 import Avatar from '@mui/material/Avatar';
 import ButtonBase from '@mui/material/ButtonBase';
 
-import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
-import EmojiEventsOutlinedIcon from '@mui/icons-material/EmojiEventsOutlined';
-import DirectionsRunIcon from '@mui/icons-material/DirectionsRun';
 
 export default function GradientCover() {
   const navigate = useNavigate();
@@ -53,8 +55,17 @@ export default function GradientCover() {
     }
   };
 
+    const handlers = useSwipeable({
+      onSwipedLeft: () => navigate('/planning'),
+      onSwipedRight: () => navigate('/exo-search'),
+      trackTouch: true,
+      trackMouse: false,
+      delta: 80,
+      preventScrollOnSwipe: false,
+    });
+
   return (
-    <Box 
+    <Box {...handlers}
       sx={{ 
         width: '100%', 
         position: 'relative', 
@@ -74,10 +85,6 @@ export default function GradientCover() {
           </IconButton>
         </Toolbar>
       </AppBar>
-        <Box sx={{ width: 250 }} >
-        </Box>
-        <Box display="flex" justifyContent="center" mt={2}>
-        </Box>
       <Toolbar />
     <Box display='flex' justifyContent='center'>
       <ButtonBase
@@ -184,13 +191,12 @@ export default function GradientCover() {
           value={value}
           onChange={(event, newValue) => {
             setValue(newValue);
-            const routes = ['/planning', '/exo-search', '/recettes', '/profile'];
+            const routes = ['/planning', '/exo-search', '/profile'];
             navigate(routes[newValue]);
           }}
         >
           <BottomNavigationAction label="Planning" icon={<DashboardIcon />} />
           <BottomNavigationAction label="Exercices" icon={<FitnessCenterIcon />} />
-          <BottomNavigationAction label="Recettes" icon={<BlenderIcon />} />
           <BottomNavigationAction label="Profile" icon={<PersonOutlineIcon />} />
         </BottomNavigation>
       </Paper>

@@ -13,6 +13,7 @@ import {
   IconButton,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { useSwipeable } from 'react-swipeable'; 
 
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import TimerIcon from '@mui/icons-material/Timer';
@@ -25,8 +26,17 @@ export default function FinSeance() {
   const [showResume, setShowResume] = useState(true);
   const [showTonnage, setShowTonnage] = useState(true);
 
+ 
+  const handlers = useSwipeable({
+      onSwipedLeft: () => navigate('/exo-search'),
+      onSwipedRight: () => navigate('/profile'),
+      trackTouch: true,
+      trackMouse: false,
+      delta: 80,
+      preventScrollOnSwipe: false,
+  });
   return (
-    <Box sx={{ bgcolor: "#f5f5f5", minHeight: "100vh", pb: 12 }}>
+    <Box sx={{ bgcolor: "#f5f5f5", minHeight: "100vh", pb: 12 }} {...handlers}>
       <AppBar position="fixed" sx={{ backgroundColor: '#fff', boxShadow: 1 }}>
         <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>

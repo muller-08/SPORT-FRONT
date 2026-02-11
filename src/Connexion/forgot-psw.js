@@ -9,20 +9,31 @@ import {
   Box,
   Link,
 } from "@mui/material";
+import { useSwipeable } from 'react-swipeable'; 
+import { useNavigate } from 'react-router-dom';
 
 export default function ForgotPsw() {
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
-
+  const navigate = useNavigate();
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Email pour réinitialisation :", email);
     setSent(true);
   };
 
+  const handlers = useSwipeable({
+    onSwipedRight: () => navigate(-1),
+    trackTouch: true,
+    trackMouse: false,
+    delta: 80,
+    preventScrollOnSwipe: false,
+  });
+
   return (
-    <Container maxWidth="sm">
-      <Paper elevation={3} sx={{ mt: 8, p: 4 }}>
+    <Box {...handlers} >
+    <Container {...handlers} maxWidth="sm">
+      <Paper elevation={3} sx={{ mt: 8, p: 4 }} >
         <Typography variant="h5" gutterBottom align="center">
           Mot de passe oublié
         </Typography>
@@ -67,5 +78,6 @@ export default function ForgotPsw() {
         </Typography>
       </Paper>
     </Container>
+    </Box>
   );
 }

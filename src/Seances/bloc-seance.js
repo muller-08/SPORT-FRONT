@@ -13,6 +13,7 @@ import {
   Chip,
 } from '@mui/material';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { useSwipeable } from 'react-swipeable'; 
 
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
@@ -25,6 +26,14 @@ export default function BlocSeance() {
   const location = useLocation();
   const { seanceId } = useParams();
   const [seance, setSeance] = useState(null);
+
+  const handlers = useSwipeable({
+    onSwipedRight: () => navigate('/profile'),
+    trackTouch: true,
+    trackMouse: false,
+    delta: 80,
+    preventScrollOnSwipe: false,
+  });
 
   useEffect(() => {
     if (location.state?.seance) {
@@ -100,7 +109,7 @@ export default function BlocSeance() {
   };
 
   return (
-    <>
+    <Box {...handlers}>
       <AppBar
         position="fixed" sx={{ backgroundColor: '#fff', boxShadow: 1 }}>
         <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -119,7 +128,7 @@ export default function BlocSeance() {
       <Toolbar />
 
       <Slide direction="right" in={slideIn} timeout={300}>
-        <Box
+        <Box {...handlers}
           sx={{
             display: 'flex',
             flexDirection: 'column',
@@ -142,6 +151,7 @@ export default function BlocSeance() {
             const exerciceCount = section.exercices?.length || 0;
 
             return (
+              <Box {...handlers} >
               <Card 
                 onClick={() => handleStartBlock(section.id)}
                 key={section.id}
@@ -250,6 +260,7 @@ export default function BlocSeance() {
                   </IconButton>
                 </Box>
               </Card>
+              </Box>
             );
           })}
 
@@ -276,6 +287,6 @@ export default function BlocSeance() {
           </Button>
         </Box>
       </Slide>
-    </>
+    </Box>
   );
 }

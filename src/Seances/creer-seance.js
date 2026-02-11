@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { notifySeanceCreated } from '../Données/notifService';
+import { useSwipeable } from 'react-swipeable'; 
 import {
   Box,
   Typography,
@@ -59,6 +60,14 @@ const CreerSeance = () => {
   const seanceFromState = location.state?.seance;
   const dateKey = location.state?.dateKey;
   
+  const handlers = useSwipeable({
+      onSwipedRight: () => navigate('/calendrier'),
+      trackTouch: true,
+      trackMouse: false,
+      delta: 80,
+      preventScrollOnSwipe: false,
+   });
+
   const [sections, setSections] = useState(() => {
     if (seanceFromState?.sections) {
       return seanceFromState.sections.map(section => ({
@@ -394,7 +403,9 @@ const CreerSeance = () => {
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <Box sx={{ 
+      <Box
+      {...handlers}
+      sx={{ 
         minHeight: '100vh', 
         bgcolor: '#f5f5f7',
         pb: 4,

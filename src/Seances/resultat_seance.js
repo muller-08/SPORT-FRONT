@@ -14,6 +14,7 @@ import {
 
 import CardMedia from '@mui/material/CardMedia';
 import { useNavigate } from 'react-router-dom';
+import { useSwipeable } from 'react-swipeable'; 
 
 import BarChartIcon from '@mui/icons-material/BarChart';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
@@ -24,8 +25,17 @@ import RepeatIcon from '@mui/icons-material/Repeat';
 export default function FinSeance() {
   const navigate = useNavigate();
 
+  const handlers = useSwipeable({
+      onSwipedLeft: () => navigate('/exo-search'),
+      onSwipedRight: () => navigate('/profile'),
+      trackTouch: true,
+      trackMouse: false,
+      delta: 80,
+      preventScrollOnSwipe: false,
+  });
+
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: '#f5f5f5' }}>
+    <Box sx={{ minHeight: '100vh', bgcolor: '#f5f5f5' }} {...handlers}>
       <AppBar position="static" elevation={1} sx={{ bgcolor: 'white', color: 'black' }}>
         <Toolbar>
           <IconButton edge="start" sx={{ mr: 2 }} onClick={() => navigate(-1)}>

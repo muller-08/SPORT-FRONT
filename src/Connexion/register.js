@@ -14,6 +14,9 @@ import {
   InputLabel,
   OutlinedInput,
 } from "@mui/material";
+import { useSwipeable } from 'react-swipeable'; 
+import { useNavigate } from 'react-router-dom';
+
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
@@ -23,6 +26,17 @@ export default function Register() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [success, setSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
+
+  const handlers = useSwipeable({
+    onSwipedRight: () => navigate(-1),
+    trackTouch: true,
+    trackMouse: false,
+    delta: 80,
+    preventScrollOnSwipe: false,
+  });
+
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -37,8 +51,9 @@ export default function Register() {
   };
 
   return (
+  <Box {...handlers} >
     <Container maxWidth="sm">
-      <Paper elevation={3} sx={{ mt: 8, p: 4 }}>
+      <Paper elevation={3} sx={{ mt: 8, p: 4 }} >
         <Typography variant="h5" gutterBottom align="center">
           Créer un compte
         </Typography>
@@ -112,5 +127,6 @@ export default function Register() {
         </Typography>
       </Paper>
     </Container>
+  </Box>
   );
 }

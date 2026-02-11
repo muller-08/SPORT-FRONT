@@ -23,6 +23,7 @@ import {
   DialogActions,
 } from '@mui/material';
 
+import { useSwipeable } from 'react-swipeable'; 
 import { Card, Typography } from '@mui/joy';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
@@ -75,7 +76,14 @@ export default function SeanceExecute() {
 
   const isMobile = useMediaQuery('(max-width:600px)');
 
-  
+  const [progress, setProgress] = React.useState(0);
+
+  React.useEffect(() => {
+    const timer = setInterval(() => {
+      setProgress((prevProgress) => (prevProgress >= 100 ? 0 : prevProgress));
+    });
+    return () => clearInterval(timer);
+  }, []);
   useEffect(() => {
     const saveProgress = () => {
       if (!seance) return;
@@ -539,15 +547,6 @@ export default function SeanceExecute() {
     );
   };
 
-  const [progress, setProgress] = React.useState(0);
-
-  React.useEffect(() => {
-    const timer = setInterval(() => {
-      setProgress((prevProgress) => (prevProgress >= 100 ? 0 : prevProgress));
-    });
-    return () => clearInterval(timer);
-  }, []);
-
   useEffect(() => {
     if (restTimer === 0 && timerDialogOpen) {
       setRestTimerActive(false); 
@@ -603,8 +602,7 @@ export default function SeanceExecute() {
         {`
           .swiper-button-next,
           .swiper-button-prev {
-            top: 100.1% !important;
-            transform: translateY(-50%) !important;
+            display: none !important;
           }
           
           .swiper-pagination {
@@ -615,10 +613,13 @@ export default function SeanceExecute() {
 
       <AppBar position="fixed" sx={{ backgroundColor: "#fff", color: "#000" }}>
         <Toolbar
-          sx={(theme) => ({
-            [theme.breakpoints.up('xs')]: {justifyContent: 'center'},
-            [theme.breakpoints.up('sm')]: {justifyContent: 'left'},
-          })}
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            position: 'relative',
+            px: 2,
+          }}
         >
           <IconButton onClick={() => navigate(`/seance/${seanceId}/blocs`, { state: { seance } })}>
             <ArrowBackIosIcon />
@@ -627,11 +628,28 @@ export default function SeanceExecute() {
           <Typography fontWeight="bold">
             {formatTime(timer)}
           </Typography>
-          <LinearProgress variant="soft" sx={{color:'#0252ff', bottom: -27}} determinate value={progress} />
-          <Typography sx={{ ml: "auto", display: "flex", alignItems: "center", gap: 0.5 }}>
+
+          <Typography sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
             {formatRestTime(restTimer)}
             <TimerIcon />
           </Typography>
+
+          <LinearProgress 
+            variant="determinate" 
+            determinate value={Math.min(progress, 100)} 
+            sx={{ 
+              position: 'absolute',
+              bottom: 0,
+              left: 0,
+              right: 0,
+              width: '100%',
+              height: 4,
+              backgroundColor: 'rgba(0, 0, 0, 0.1)',
+              '& .MuiLinearProgress-bar': {
+                backgroundColor: '#0252ff',
+              }
+            }} 
+          />
         </Toolbar>
       </AppBar>
       <Toolbar />
@@ -640,16 +658,15 @@ export default function SeanceExecute() {
         <Box sx={{ display: "flex", justifyContent: "center" }}>
           <Box sx={{ width: "100%", maxWidth: 600, px: 2 }}>
             <Swiper
-              modules={[Pagination, Navigation]}
+              modules={[Pagination]}
               slidesPerView={1}
               spaceBetween={30}
               loop={false}
               pagination={{ type: 'progressbar' }}
-              navigation
-              cssMode={true}
               onSlideChange={(swiper) => {
                 const currentSlide = swiper.realIndex + 1;
-                setProgress((currentSlide / groupedCards.length) * 100);
+                const newProgress = (currentSlide / groupedCards.length) * 100;
+                setProgress(Math.min(newProgress, 100));
               }}
             >
               {groupedCards.map((group, groupIndex) => (
@@ -664,13 +681,18 @@ export default function SeanceExecute() {
             </Swiper>
 
               <Button
-              fullWidth
                 variant="contained"
-                sx={{ 
-                  mt: 2, 
+                sx={{
+                  alignItems:"center",
+                  width: '60%',
+                  position: "fixed",
+                  bottom: 16,
+                  left: "20%",
+                  right: 16,
+                  borderRadius: 4,
                   fontWeight: "bold",
-                  
-
+                  zIndex: 1300, 
+                  mt: 2, 
                 }}
                 onClick={handleValidateSeance}
               >

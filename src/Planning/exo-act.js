@@ -21,6 +21,7 @@ import CardActionArea from '@mui/material/CardActionArea';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTheme, useMediaQuery } from '@mui/material';
+import { useSwipeable } from 'react-swipeable'; 
 
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
@@ -39,6 +40,16 @@ export default function ExoAct() {
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+  const handlers = useSwipeable({
+    onSwipedLeft: () => navigate('/exo-search'),
+    onSwipedRight: () => navigate('/profile'),
+    trackTouch: true,
+    trackMouse: false,
+    delta: 80,
+    preventScrollOnSwipe: false,
+  });
+
 
   useEffect(() => {
     const timeTimer = setInterval(() => {
@@ -89,7 +100,7 @@ export default function ExoAct() {
       </AppBar>
 
       <Drawer anchor="right" open={drawerOpen} onClose={toggleDrawer(false)}>
-        <Box sx={{ width: 250 }} role="presentation" onClick={toggleDrawer(false)} onKeyDown={toggleDrawer(false)}>
+        <Box {...handlers} sx={{ width: 250 }} role="presentation" onClick={toggleDrawer(false)} onKeyDown={toggleDrawer(false)}>
           <List>
             <ListItem disablePadding>
               <ListItemButton onClick={() => navigate(`/seance/${seanceId}`)}>

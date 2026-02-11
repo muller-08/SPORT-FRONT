@@ -15,8 +15,11 @@ import {
   Select,
   FormControl,
 } from '@mui/material';
+
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { notifySeanceCompleted } from '../Données/notifService';
+import { useSwipeable } from 'react-swipeable'; 
+
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
@@ -48,6 +51,14 @@ export default function FinSeance() {
     duration: '00:00:00',
     tonnage: 0,
     series: 0,
+  });
+  
+  const handlers = useSwipeable({
+    onSwipedRight: () => navigate(-1),
+    trackTouch: true,
+    trackMouse: false,
+    delta: 80,
+    preventScrollOnSwipe: false,
   });
 
   useEffect(() => {
@@ -136,7 +147,7 @@ export default function FinSeance() {
   };
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: '#f5f5f5' }}>
+    <Box {...handlers} sx={{ minHeight: '100vh', bgcolor: '#f5f5f5' }}>
       <AppBar position="static" elevation={1} sx={{ bgcolor: 'white', color: 'black' }}>
         <Toolbar>
           <IconButton edge="start" sx={{ mr: 2 }} onClick={() => navigate(`/seance/${seanceId}/execute`)}>

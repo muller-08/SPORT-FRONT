@@ -13,6 +13,7 @@ import { Card } from '@mui/joy';
 import CardMedia from '@mui/material/CardMedia';
 import CardActionArea from '@mui/material/CardActionArea';
 import { useNavigate, useLocation } from "react-router-dom";
+import { useSwipeable } from 'react-swipeable'; 
 
 import SearchIcon from '@mui/icons-material/Search';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -72,8 +73,16 @@ export default function ListAct() {
 
   const isSelected = (id) => selectedId === id;
 
+  const handlers = useSwipeable({
+    onSwipedRight: () => navigate(-1),
+    trackTouch: true,
+    trackMouse: false,
+    delta: 80,
+    preventScrollOnSwipe: false,
+  });
+
   return (
-    <>
+    <Box {...handlers}>
       <AppBar position="static" sx={{ backgroundColor: '#fff', color: '#000', boxShadow: 1 }}>
         <Toolbar>
           <IconButton edge="start" onClick={() => navigate(returnUrl || '/planning')}>
@@ -167,6 +176,6 @@ export default function ListAct() {
           )}
         </Box>
       </Slide>
-    </>
+    </Box>
   );
 }

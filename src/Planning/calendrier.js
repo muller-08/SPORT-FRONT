@@ -16,6 +16,7 @@ import {
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useMediaQuery } from '@mui/material';
+import { useSwipeable } from 'react-swipeable'; 
 
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import EventIcon from '@mui/icons-material/Event';
@@ -67,6 +68,14 @@ export default function CalendarList() {
       day = addDays(day, 1);
     }
     return days;
+  });
+
+  const handlers = useSwipeable({
+    onSwipedRight: () => navigate('/planning'),
+    trackTouch: true,
+    trackMouse: false,
+    delta: 80,
+    preventScrollOnSwipe: false,
   });
 
   useEffect(() => {
@@ -197,7 +206,7 @@ const handleDeleteAllStorage = () => {
 
 
   return (
-    <Box 
+    <Box {...handlers}
     sx={{ minHeight: '100vh', bgcolor: '#fff' }}>
       <AppBar position="fixed" sx={{ bgcolor: '#fff', color: '#000', boxShadow: 0 }}>
         <Toolbar>
