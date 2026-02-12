@@ -20,6 +20,7 @@ import {
 
 import { ExerciceProvider } from "./Données/exercices";
 import { SeancesProvider } from "./Données/seancepage";
+import { getUsername } from "./Données/Usernames";
 
 import CloseIcon from "@mui/icons-material/Close";
 import IosShareIcon from "@mui/icons-material/IosShare";
@@ -57,38 +58,12 @@ function Login() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const generateRandomUsername = () => {
-    const noms = [
-      "Tartempion", "Bidule", "Trucmuche", "Machin", "Chose",
-      "Groschat", "Petitloup", "Pouledor", "Renardargent", "Ours",
-      "Faucon", "Tigre", "Panthère", "Dragon", "Phoenix",
-      "Spartiate", "Guerrier", "Champion", "Viking", "Samurai",
-      "Tornado", "Eclair", "Tempête", "Avalanche", "Cyclone",
-      "Rocco", "Bruno", "Maximus", "Titan", "Atlas",
-      "Hercule", "Thor", "Zeus", "Odin", "Ares"
-    ];
-    
-    const suffixes = [
-      "99", "2000",
-      "Supreme", "Ultra", "Mega", "Super",
-      "Prime", "Elite", "Alpha", "Omega", "X"
-    ];
-    
-    const randomNom = noms[Math.floor(Math.random() * noms.length)];
-    const randomSuffix = Math.random() > 0.5 ? suffixes[Math.floor(Math.random() * suffixes.length)] : "";
-    
-    return randomNom + randomSuffix;
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log(email, password);
     
-    if (!localStorage.getItem('username')) {
-      const username = generateRandomUsername();
-      localStorage.setItem('username', username);
-      console.log('Nom d\'utilisateur généré:', username);
-    }
+    const username = getUsername();
+    console.log('Nom d\'utilisateur:', username);
   };
 
   return (
@@ -155,6 +130,7 @@ function Login() {
     </Container>
   );
 }
+
 export function InstallPWA() {
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [showInstallButton, setShowInstallButton] = useState(false);
@@ -289,6 +265,7 @@ export function InstallPWA() {
     </>
   );
 }
+
 // Chemin Routes
 export default function App() {
   return (
