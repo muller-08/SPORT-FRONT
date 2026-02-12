@@ -14,7 +14,7 @@ import { Card } from '@mui/joy';
 import { useNavigate } from 'react-router-dom';
 import CardMedia from '@mui/material/CardMedia';
 import CardActionArea from '@mui/material/CardActionArea';
-import { useSwipeable } from 'react-swipeable'; 
+import { useSwipeable } from 'react-swipeable';
 
 import SearchIcon from '@mui/icons-material/Search';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -42,16 +42,17 @@ export default function ListAct() {
     onSwipedLeft: () => navigate('/profile'),
     onSwipedRight: () => navigate('/planning'),
     trackTouch: true,
-    trackMouse: false,
     delta: 80,
-    preventScrollOnSwipe: false,
   });
 
   return (
-    <Box {...handlers}
-      sx={{ 
-        minHeight: '100vh',
+    <Box
+      {...handlers}
+      sx={{
+        minHeight: '100dvh',
         touchAction: 'pan-y',
+        display: 'flex',
+        flexDirection: 'column',
       }}
     >
       <Box
@@ -59,16 +60,9 @@ export default function ListAct() {
           p: 2,
           display: 'flex',
           justifyContent: 'center',
-          width: '100%',
         }}
       >
-        <Card
-          sx={{
-            p: 1,
-            width: '100%',
-            maxWidth: 400,
-          }}
-        >
+        <Card sx={{ p: 1, width: '100%', maxWidth: 400 }}>
           <Input
             fullWidth
             startAdornment={<SearchIcon />}
@@ -83,7 +77,7 @@ export default function ListAct() {
         <Box
           sx={{
             p: 2,
-            pb: 10,
+            pb: { xs: '96px', sm: '80px' }, 
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -107,6 +101,7 @@ export default function ListAct() {
                   px: 1.5,
                   py: isMobile ? 1 : 0.75,
                   display: 'flex',
+                  alignItems: 'center',
                   gap: 1.5,
                   width: '100%',
                   '&:hover': { backgroundColor: '#f0f0f0' },
@@ -121,6 +116,7 @@ export default function ListAct() {
                     height: isMobile ? 48 : 44,
                     borderRadius: 1,
                     objectFit: 'cover',
+                    flexShrink: 0,
                   }}
                 />
 
@@ -138,6 +134,7 @@ export default function ListAct() {
       </Slide>
 
       <Paper
+        elevation={3}
         sx={{
           position: 'fixed',
           bottom: 0,
@@ -145,7 +142,6 @@ export default function ListAct() {
           right: 0,
           zIndex: 1200,
         }}
-        elevation={3}
       >
         <BottomNavigation
           showLabels
@@ -156,9 +152,18 @@ export default function ListAct() {
             navigate(routes[newValue]);
           }}
         >
-          <BottomNavigationAction label="Planning" icon={<DashboardIcon />} />
-          <BottomNavigationAction label="Exercices" icon={<FitnessCenterIcon />} />
-          <BottomNavigationAction label="Profile" icon={<PersonOutlineIcon />} />
+          <BottomNavigationAction
+            label="Planning"
+            icon={<DashboardIcon />}
+          />
+          <BottomNavigationAction
+            label="Exercices"
+            icon={<FitnessCenterIcon />}
+          />
+          <BottomNavigationAction
+            label="Profile"
+            icon={<PersonOutlineIcon />}
+          />
         </BottomNavigation>
       </Paper>
     </Box>
