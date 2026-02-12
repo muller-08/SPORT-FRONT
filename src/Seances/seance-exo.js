@@ -673,14 +673,13 @@ export default function SeanceExecute() {
       <Slide direction="right" in={slideIn} timeout={300}>
         <Box sx={{ display: "flex", justifyContent: "center" }}>
           <Box sx={{ width: "100%", maxWidth: 600, px: 2 }}>
-              <Swiper
-                key={Math.floor(progress)} 
-                modules={[Pagination]}
-                slidesPerView={1}
-                spaceBetween={30}
-                loop={false}
-                pagination={{ type: 'progressbar' }}
-              >
+            <Swiper
+              modules={[Pagination]}
+              slidesPerView={1}
+              spaceBetween={30}
+              loop={false}
+              pagination={{ type: 'progressbar' }}
+            >
               {groupedCards.map((group, groupIndex) => (
                 <SwiperSlide key={groupIndex}>
                   <Box sx={{ py: 2 }}>

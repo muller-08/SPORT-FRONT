@@ -186,15 +186,24 @@ export default function Planning() {
               px: 2,
               overflowX: 'auto',
               '&::-webkit-scrollbar': { display: 'none' },
+              display: 'flex',
+              justifyContent: 'center',
             }}
           >
             <Slide direction="right" in={slideIn} timeout={300}>
-              <Grid container spacing={1} wrap="nowrap">
+              <Grid 
+                container 
+                spacing={1} 
+                wrap="nowrap"
+                sx={{
+                  maxWidth: { xs: '100%', sm: '100%', md: 600, lg: 700 },
+                }}
+              >
                 {seancesActives.map((seance) => (
                   <Grid
                     key={`${seance.dateKey}-${seance.id}`}
                     sx={{
-                      minWidth: '100%',
+                      minWidth: { xs: '100%', md: 600, lg: 700 },
                     }}
                   >
                     <Card
