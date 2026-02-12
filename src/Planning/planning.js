@@ -26,6 +26,8 @@ import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import EventIcon from '@mui/icons-material/Event';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 
+import { getUsername } from "../Données/Usernames";
+
 export default function Planning() {
   const navigate = useNavigate();
   const [value, setValue] = useState(0);
@@ -49,38 +51,8 @@ export default function Planning() {
   });
 
   useEffect(() => {
-    const generateRandomUsername = () => {
-      const noms = [
-        "Tartempion", "Bidule", "Trucmuche", "Machin", "Chose",
-        "Groschat", "Petitloup", "Pouledor", "Renardargent", "Ours",
-        "Faucon", "Tigre", "Panthère", "Dragon", "Phoenix",
-        "Spartiate", "Guerrier", "Champion", "Viking", "Samurai",
-        "Tornado", "Eclair", "Tempête", "Avalanche", "Cyclone",
-        "Rocco", "Bruno", "Maximus", "Titan", "Atlas",
-        "Hercule", "Thor", "Zeus", "Odin", "Ares"
-      ];
-      
-      const suffixes = [
-        "99", "2000",
-        "Legend", "Supreme", "Ultra", "Mega", "Super",
-        "Prime", "Elite", "Alpha", "Omega", "X"
-      ];
-      
-      const randomNom = noms[Math.floor(Math.random() * noms.length)];
-      const randomSuffix = Math.random() > 0.5 ? suffixes[Math.floor(Math.random() * suffixes.length)] : "";
-      
-      return randomNom + randomSuffix;
-    };
-
-    let savedUsername = localStorage.getItem('username');
-    
-    if (!savedUsername) {
-      savedUsername = generateRandomUsername();
-      localStorage.setItem('username', savedUsername);
-      console.log('Nouveau nom généré:', savedUsername);
-    }
-    
-    setUsername(savedUsername);
+    const username = getUsername();
+    setUsername(username);
 
     const loadSeances = () => {
       try {
@@ -186,8 +158,8 @@ export default function Planning() {
               px: 2,
               overflowX: 'auto',
               '&::-webkit-scrollbar': { display: 'none' },
-              display: 'flex',
-              justifyContent: 'center',
+              display: { xs: 'block', md: 'flex' },
+              justifyContent: { md: 'center' },
             }}
           >
             <Slide direction="right" in={slideIn} timeout={300}>
@@ -196,7 +168,7 @@ export default function Planning() {
                 spacing={1} 
                 wrap="nowrap"
                 sx={{
-                  maxWidth: { xs: '100%', sm: '100%', md: 600, lg: 700 },
+                  maxWidth: { md: 600, lg: 700 },
                 }}
               >
                 {seancesActives.map((seance) => (
