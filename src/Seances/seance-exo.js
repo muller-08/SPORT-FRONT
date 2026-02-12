@@ -26,7 +26,7 @@ import {
 import { useSwipeable } from 'react-swipeable'; 
 import { Card, Typography } from '@mui/joy';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import CardMedia from '@mui/material/CardMedia';
 import CardActionArea from '@mui/material/CardActionArea';
 import { useMediaQuery } from '@mui/material';
@@ -76,10 +76,9 @@ export default function SeanceExecute() {
 
   const isMobile = useMediaQuery('(max-width:600px)');
 
-  const [progress, setProgress] = React.useState(0);
-
-  React.useEffect(() => {
-    if (!cards || cards.length === 0) return;
+  // Calcul de la progression en temps réel avec useMemo pour optimiser
+  const progress = useMemo(() => {
+    if (!cards || cards.length === 0) return 0;
     
     let totalSeries = 0;
     let completedSeries = 0;
@@ -91,8 +90,7 @@ export default function SeanceExecute() {
       completedSeries += checkedCount;
     });
     
-    const percentage = totalSeries > 0 ? (completedSeries / totalSeries) * 100 : 0;
-    setProgress(percentage);
+    return totalSeries > 0 ? (completedSeries / totalSeries) * 100 : 0;
   }, [cards]);
 
   useEffect(() => {
@@ -652,7 +650,8 @@ export default function SeanceExecute() {
 
           <LinearProgress 
             variant="determinate" 
-            determinate value={Math.min(progress, 100)} 
+            determinate 
+            value={Math.min(progress, 100)} 
             sx={{ 
               position: 'absolute',
               bottom: 0,
