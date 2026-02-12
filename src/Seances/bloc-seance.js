@@ -57,19 +57,10 @@ export default function BlocSeance() {
     }
   }, [seanceId, location.state]);
 
-  if (!seance) {
-    return (
-      <Box sx={{ p: 3 }}>
-        <Typography>Séance non trouvée</Typography>
-        <Button onClick={() => navigate('/planning')}>Retour</Button>
-      </Box>
-    );
-  }
-
   const calculateBlockProgress = (section) => {
     if (!section.exercices || section.exercices.length === 0) return 0;
     
-    const draft = localStorage.getItem(`seance-exec-${seanceId}`);
+    const draft = localStorage.getItem(`seance-exec-${seanceId}-${section.id}`);
     if (!draft) return 0;
 
     try {
@@ -107,6 +98,15 @@ export default function BlocSeance() {
   const handleValidateSeance = () => {
     navigate(`/fin-seance/${seanceId}`);
   };
+
+  if (!seance) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Typography>Séance non trouvée</Typography>
+        <Button onClick={() => navigate('/planning')}>Retour</Button>
+      </Box>
+    );
+  }
 
   return (
     <Box {...handlers}>
@@ -151,10 +151,9 @@ export default function BlocSeance() {
             const exerciceCount = section.exercices?.length || 0;
 
             return (
-              <Box {...handlers} >
+              <Box {...handlers} key={section.id}>
               <Card 
                 onClick={() => handleStartBlock(section.id)}
-                key={section.id}
                 variant="outlined" 
                 sx={{ 
                   width: '100%', 
