@@ -79,11 +79,22 @@ export default function SeanceExecute() {
   const [progress, setProgress] = React.useState(0);
 
   React.useEffect(() => {
-    const timer = setInterval(() => {
-      setProgress((prevProgress) => (prevProgress >= 100 ? 0 : prevProgress));
+    if (!cards || cards.length === 0) return;
+    
+    let totalSeries = 0;
+    let completedSeries = 0;
+    
+    cards.forEach(card => {
+      const seriesCount = card.series?.length || 0;
+      const checkedCount = card.checked?.length || 0;
+      totalSeries += seriesCount;
+      completedSeries += checkedCount;
     });
-    return () => clearInterval(timer);
-  }, []);
+    
+    const percentage = totalSeries > 0 ? (completedSeries / totalSeries) * 100 : 0;
+    setProgress(percentage);
+  }, [cards]);
+
   useEffect(() => {
     const saveProgress = () => {
       if (!seance) return;
@@ -221,6 +232,10 @@ export default function SeanceExecute() {
   };
 
   const handleCheckboxClick = (cardId, setIndex) => {
+    if (restTimerActive) {
+      return;
+    }
+
     const card = cards.find(c => c.id === cardId);
     
     if (card.checked && card.checked.includes(setIndex)) {
@@ -438,7 +453,8 @@ export default function SeanceExecute() {
                           key={serie.id}
                           sx={{  
                             opacity: (card.checked || []).includes(index) ? 0.4 : 1,
-                            pointerEvents: (card.checked || []).includes(index) ? "none" : "auto"
+                            pointerEvents: (card.checked || []).includes(index) || restTimerActive ? "none" : "auto",
+                            cursor: restTimerActive ? 'not-allowed' : 'pointer'
                           }}
                         >
                           <TableCell sx={{ fontSize: isMobile ? '0.75rem' : '0.875rem', px: isMobile ? 1 : 2 }}>
@@ -458,7 +474,7 @@ export default function SeanceExecute() {
                               icon={<DoneOutlineIcon sx={{ fontSize: isMobile ? '1.2rem' : '1.5rem' }} />}
                               checkedIcon={<DoneIcon sx={{ fontSize: isMobile ? '1.2rem' : '1.5rem' }} />}
                               checked={(card.checked || []).includes(index)}
-                              disabled={(card.checked || []).includes(index)}
+                              disabled={(card.checked || []).includes(index) || restTimerActive}
                               onChange={() => handleCheckboxClick(card.id, index)}
                               sx={{ 
                                 p: isMobile ? 0.5 : 1,
@@ -507,7 +523,7 @@ export default function SeanceExecute() {
                                 icon={<DoneOutlineIcon sx={{ fontSize: isMobile ? '1.2rem' : '1.5rem' }} />}
                                 checkedIcon={<DoneIcon sx={{ fontSize: isMobile ? '1.2rem' : '1.5rem' }} />}
                                 checked={(card.checked || []).includes(index)}
-                                disabled={(card.checked || []).includes(index)}
+                                disabled={(card.checked || []).includes(index) || restTimerActive}
                                 onChange={() => handleCheckboxClick(card.id, index)}
                                 sx={{ 
                                   p: isMobile ? 0.5 : 1,
@@ -657,18 +673,14 @@ export default function SeanceExecute() {
       <Slide direction="right" in={slideIn} timeout={300}>
         <Box sx={{ display: "flex", justifyContent: "center" }}>
           <Box sx={{ width: "100%", maxWidth: 600, px: 2 }}>
-            <Swiper
-              modules={[Pagination]}
-              slidesPerView={1}
-              spaceBetween={30}
-              loop={false}
-              pagination={{ type: 'progressbar' }}
-              onSlideChange={(swiper) => {
-                const currentSlide = swiper.realIndex + 1;
-                const newProgress = (currentSlide / groupedCards.length) * 100;
-                setProgress(Math.min(newProgress, 100));
-              }}
-            >
+              <Swiper
+                key={Math.floor(progress)} 
+                modules={[Pagination]}
+                slidesPerView={1}
+                spaceBetween={30}
+                loop={false}
+                pagination={{ type: 'progressbar' }}
+              >
               {groupedCards.map((group, groupIndex) => (
                 <SwiperSlide key={groupIndex}>
                   <Box sx={{ py: 2 }}>
