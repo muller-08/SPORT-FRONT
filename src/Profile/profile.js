@@ -143,44 +143,61 @@ export default function GradientCover() {
           </Box>
   <Slide direction="right" in={slideIn} timeout={300}>
        <Box display='flex' justifyContent='center' width='100%' sx={{ flexGrow: 1 }}>
-          <Grid container spacing={2} columns={{ xs: 4, sm: 8 }}>
-            <Grid size={{ xs: 6, md: 4 }}>
-              <Item sx={{ color: '#003cff'}}>{<EmojiEventsOutlinedIcon/>}
-                <Typography>Objectif</Typography>
-                <Typography fontWeight='bold'> Remise en forme</Typography>
-                </Item>
-            </Grid>
-            <Grid size={{ xs: 6, md: 4 }}>
-                <Item sx={{ color: '#003cff'}}>{<DirectionsRunIcon/>} 
-                <Typography>NAP</Typography>
-                <Typography fontWeight='bold'> Sédentaire</Typography>
-                </Item>
-            </Grid>
-            <Grid sx={{ textAlign: 'left'}} size={{ xs: 6, md: 4 }}>
-              <Item sx={{ textAlign: 'left'}}>Poids
-              <Typography fontWeight='bold'>Poids kg</Typography>
-              <Typography>JJ/MM/YYYY</Typography>
-              </Item>
-            </Grid>
-            <Grid size={{ xs: 6, md: 4 }}>
-              <Item sx={{ textAlign: 'left'}}>Masse grasse
-                <Typography fontWeight='bold'> Nombre% </Typography>
-                <Typography> JJ/MM/YYYY </Typography>
-              </Item>
-            </Grid>
-            <Grid size={{ xs: 6, md: 4 }}>
-              <Item sx={{ textAlign: 'left'}}>Bras
-                <Typography fontWeight='bold'> Nombre% </Typography>
-                <Typography> JJ/MM/YYYY </Typography>
-              </Item>
-            </Grid>
-            <Grid size={{ xs: 6, md: 4 }}>
-              <Item sx={{ textAlign: 'left'}}>Avant-bras
-                <Typography fontWeight='bold'> Nombre% </Typography>
-                <Typography> JJ/MM/YYYY </Typography>
-              </Item>
-            </Grid>
+         <Grid
+          container
+          spacing={2}
+          columns={{ xs: 4, sm: 8 }}
+          justifyContent="center"
+          alignItems="center"
+        >
+          <Grid item xs={4} sm={4} md={2}>
+            <Item sx={{ color: '#003cff' }}>
+              <EmojiEventsOutlinedIcon />
+              <Typography>Objectif</Typography>
+              <Typography fontWeight="bold">Remise en forme</Typography>
+            </Item>
           </Grid>
+
+          <Grid item xs={4} sm={4} md={2}>
+            <Item sx={{ color: '#003cff' }}>
+              <DirectionsRunIcon />
+              <Typography>NAP</Typography>
+              <Typography fontWeight="bold">Sédentaire</Typography>
+            </Item>
+          </Grid>
+
+          <Grid item xs={4} sm={4} md={2}>
+            <Item sx={{ textAlign: 'left' }}>
+              Poids
+              <Typography fontWeight="bold">Poids kg</Typography>
+              <Typography>JJ/MM/YYYY</Typography>
+            </Item>
+          </Grid>
+
+          <Grid item xs={4} sm={4} md={2}>
+            <Item sx={{ textAlign: 'left' }}>
+              Masse grasse
+              <Typography fontWeight="bold">Nombre%</Typography>
+              <Typography>JJ/MM/YYYY</Typography>
+            </Item>
+          </Grid>
+
+          <Grid item xs={4} sm={4} md={2}>
+            <Item sx={{ textAlign: 'left' }}>
+              Bras
+              <Typography fontWeight="bold">Nombre%</Typography>
+              <Typography>JJ/MM/YYYY</Typography>
+            </Item>
+          </Grid>
+
+          <Grid item xs={4} sm={4} md={2}>
+            <Item sx={{ textAlign: 'left' }}>
+              Avant-bras
+              <Typography fontWeight="bold">Nombre%</Typography>
+              <Typography>JJ/MM/YYYY</Typography>
+            </Item>
+          </Grid>
+        </Grid>
     </Box>
 </Slide>
       <Box sx={{ position: 'fixed', bottom: 0, width: '100%' }}>
