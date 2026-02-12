@@ -31,6 +31,7 @@ export default function Planning() {
   const [value, setValue] = useState(0);
   const [seancesCalendrier, setSeancesCalendrier] = useState({});
   const [slideIn] = useState(true);
+  const [username, setUsername] = useState('User');
 
   const handlers = useSwipeable({
     onSwipedLeft: () => navigate('/exo-search'),
@@ -48,6 +49,39 @@ export default function Planning() {
   });
 
   useEffect(() => {
+    const generateRandomUsername = () => {
+      const noms = [
+        "Tartempion", "Bidule", "Trucmuche", "Machin", "Chose",
+        "Groschat", "Petitloup", "Pouledor", "Renardargent", "Ours",
+        "Faucon", "Tigre", "Panthère", "Dragon", "Phoenix",
+        "Spartiate", "Guerrier", "Champion", "Viking", "Samurai",
+        "Tornado", "Eclair", "Tempête", "Avalanche", "Cyclone",
+        "Rocco", "Bruno", "Maximus", "Titan", "Atlas",
+        "Hercule", "Thor", "Zeus", "Odin", "Ares"
+      ];
+      
+      const suffixes = [
+        "99", "2000",
+        "Legend", "Supreme", "Ultra", "Mega", "Super",
+        "Prime", "Elite", "Alpha", "Omega", "X"
+      ];
+      
+      const randomNom = noms[Math.floor(Math.random() * noms.length)];
+      const randomSuffix = Math.random() > 0.5 ? suffixes[Math.floor(Math.random() * suffixes.length)] : "";
+      
+      return randomNom + randomSuffix;
+    };
+
+    let savedUsername = localStorage.getItem('username');
+    
+    if (!savedUsername) {
+      savedUsername = generateRandomUsername();
+      localStorage.setItem('username', savedUsername);
+      console.log('Nouveau nom généré:', savedUsername);
+    }
+    
+    setUsername(savedUsername);
+
     const loadSeances = () => {
       try {
         const saved = localStorage.getItem('seancesCalendrier');
@@ -103,7 +137,7 @@ export default function Planning() {
       <AppBar position="fixed" sx={{ backgroundColor: '#fff', boxShadow: 1 }}>
         <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
           <Typography level="title-lg" fontWeight="bold" sx={{ color:"#000", fontSize: { xs: '1.1rem', sm: '1.25rem' } }}>
-            Hello User
+            Hello {username}
           </Typography>
           <Box>
             <IconButton sx={{ color: '#000' }} onClick={() => navigate('/calendrier')}>
