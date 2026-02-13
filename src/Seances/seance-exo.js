@@ -35,7 +35,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { Pagination } from 'swiper/modules'; 
-import LinearProgress from '@mui/joy/LinearProgress';     
+import LinearProgress from '@mui/material/LinearProgress';  
 
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
@@ -648,7 +648,6 @@ export default function SeanceExecute() {
 
           <LinearProgress 
             variant="determinate" 
-            determinate 
             value={Math.min(swiperProgress, 99.9)} 
             sx={{ 
               position: 'absolute',
