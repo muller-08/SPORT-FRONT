@@ -703,7 +703,7 @@ export default function SeanceExecute() {
                   width: '30%',
                   position: "fixed",
                   bottom: 16,
-                  left: "30%",
+                  left: "35%",
                   right: 16,
                   borderRadius: 4,
                   fontWeight: "bold",
