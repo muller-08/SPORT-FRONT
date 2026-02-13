@@ -677,8 +677,7 @@ export default function SeanceExecute() {
               loop={false}
               pagination={{ type: 'progressbar' }}
               onSlideChange={(swiper) => {
-                console.log('Slide changed to:', swiper.activeIndex);
-                setCurrentSlideIndex(swiper.activeIndex);
+                setCurrentSlideIndex(swiper.realIndex);
               }}
             >
               {groupedCardsData.map((group, groupIndex) => (
