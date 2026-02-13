@@ -700,10 +700,10 @@ export default function SeanceExecute() {
                 variant="contained"
                 sx={{
                   alignItems:"center",
-                  width: '40%',
+                  width: '30%',
                   position: "fixed",
                   bottom: 16,
-                  left: "30%",
+                  left: "40%",
                   right: 16,
                   borderRadius: 4,
                   fontWeight: "bold",
