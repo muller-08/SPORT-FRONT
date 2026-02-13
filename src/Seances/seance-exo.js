@@ -76,31 +76,18 @@ export default function SeanceExecute() {
 
   const isMobile = useMediaQuery('(max-width:600px)');
 
-  const progress = useMemo(() => {
-    if (!cards || cards.length === 0) return 0;
-    
-    let totalSeries = 0;
-    let completedSeries = 0;
-    
-    cards.forEach(card => {
-      const seriesCount = card.series?.length || 0;
-      const checkedCount = card.checked?.length || 0;
-      totalSeries += seriesCount;
-      completedSeries += checkedCount;
-    });
-    
-    return totalSeries > 0 ? (completedSeries / totalSeries) * 100 : 0;
+  const groupedCardsData = useMemo(() => {
+    const grouped = [];
+    for (let i = 0; i < cards.length; i += 2) {
+      grouped.push(cards.slice(i, i + 2));
+    }
+    return grouped;
   }, [cards]);
 
-  const groupedCards = [];
-  for (let i = 0; i < cards.length; i += 2) {
-    groupedCards.push(cards.slice(i, i + 2));
-  }
-
   const swiperProgress = useMemo(() => {
-    if (groupedCards.length === 0) return 0;
-    return ((currentSlideIndex + 1) / groupedCards.length) * 100;
-  }, [currentSlideIndex, groupedCards.length]);
+    if (groupedCardsData.length === 0) return 0;
+    return ((currentSlideIndex + 1) / groupedCardsData.length) * 100;
+  }, [currentSlideIndex, groupedCardsData.length]);
 
   useEffect(() => {
     const saveProgress = () => {
@@ -689,9 +676,12 @@ export default function SeanceExecute() {
               spaceBetween={30}
               loop={false}
               pagination={{ type: 'progressbar' }}
-              onSlideChange={(swiper) => setCurrentSlideIndex(swiper.activeIndex)}
+              onSlideChange={(swiper) => {
+                console.log('Slide changed to:', swiper.activeIndex);
+                setCurrentSlideIndex(swiper.activeIndex);
+              }}
             >
-              {groupedCards.map((group, groupIndex) => (
+              {groupedCardsData.map((group, groupIndex) => (
                 <SwiperSlide key={groupIndex}>
                   <Box sx={{ py: 2 }}>
                     {group.map((card, cardIndex) =>
