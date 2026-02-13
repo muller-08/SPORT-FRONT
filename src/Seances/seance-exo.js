@@ -22,8 +22,7 @@ import {
   DialogContent,
   DialogActions,
 } from '@mui/material';
-
-import { useSwipeable } from 'react-swipeable'; 
+ 
 import { Card, Typography } from '@mui/joy';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useState, useEffect, useMemo } from 'react';
@@ -35,7 +34,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-import { Pagination, Navigation } from 'swiper/modules'; 
+import { Pagination } from 'swiper/modules'; 
 import LinearProgress from '@mui/joy/LinearProgress';     
 
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
@@ -704,7 +703,7 @@ export default function SeanceExecute() {
                   width: '40%',
                   position: "fixed",
                   bottom: 16,
-                  left: "20%",
+                  left: "30%",
                   right: 16,
                   borderRadius: 4,
                   fontWeight: "bold",
