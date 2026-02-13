@@ -29,6 +29,10 @@ import {
   MenuItem,
   FormControl,
   useMediaQuery,
+  Menu,
+  Snackbar,
+  Alert,
+  DialogActions,
 } from '@mui/material';
 
 import {
@@ -47,6 +51,8 @@ import {
   ExpandMore,
   Remove,
   Edit,
+  FileUpload,
+  FileDownload,
 } from '@mui/icons-material';
 import { useExercices } from '../Données/exercices';
 
@@ -114,6 +120,13 @@ const CreerSeance = () => {
   const [expandedExercices, setExpandedExercices] = useState({});
   const [editingSectionId, setEditingSectionId] = useState(null);
   const [editingSectionTitle, setEditingSectionTitle] = useState('');
+  
+  // Nouveaux états pour export/import
+  const [copyMenuAnchor, setCopyMenuAnchor] = useState(null);
+  const [selectedSectionForCopy, setSelectedSectionForCopy] = useState(null);
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
+  const [importText, setImportText] = useState('');
 
   useEffect(() => {
     if (sessionData.autoSave && dateKey) {
@@ -381,6 +394,100 @@ const CreerSeance = () => {
     setEditingSectionTitle('');
   };
 
+  const handleCopyMenuOpen = (event, sectionId) => {
+    setCopyMenuAnchor(event.currentTarget);
+    setSelectedSectionForCopy(sectionId);
+  };
+
+  const handleCopyMenuClose = () => {
+    setCopyMenuAnchor(null);
+    setSelectedSectionForCopy(null);
+  };
+
+  const handleExportExercices = () => {
+    const section = sections.find(s => s.id === selectedSectionForCopy);
+    if (section && section.exercices && section.exercices.length > 0) {
+      const exportData = {
+        version: '1.0',
+        exportDate: new Date().toISOString(),
+        sectionTitle: section.title,
+        exercices: section.exercices
+      };
+      
+      const jsonString = JSON.stringify(exportData, null, 2);
+      
+      navigator.clipboard.writeText(jsonString).then(() => {
+        setSnackbar({
+          open: true,
+          message: `${section.exercices.length} exercice(s) copié(s) dans le presse-papiers`,
+          severity: 'success'
+        });
+      }).catch(() => {
+        setSnackbar({
+          open: true,
+          message: 'Erreur lors de la copie',
+          severity: 'error'
+        });
+      });
+    } else {
+      setSnackbar({
+        open: true,
+        message: 'Aucun exercice à exporter',
+        severity: 'warning'
+      });
+    }
+    handleCopyMenuClose();
+  };
+
+  const handleOpenImportDialog = () => {
+    setImportDialogOpen(true);
+    handleCopyMenuClose();
+  };
+
+  const handleImportExercices = () => {
+    try {
+      const importData = JSON.parse(importText);
+      
+      if (!importData.exercices || !Array.isArray(importData.exercices)) {
+        throw new Error('Format de données invalide');
+      }
+
+      setSections(sections.map(section => {
+        if (section.id === selectedSectionForCopy) {
+          const newExercices = importData.exercices.map(ex => ({
+            ...ex,
+            id: `${section.id}-ex-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            series: ex.series.map((s, idx) => ({
+              ...s,
+              id: `${section.id}-ex-${Date.now()}-s${idx + 1}`
+            }))
+          }));
+
+          return {
+            ...section,
+            exercices: [...(section.exercices || []), ...newExercices]
+          };
+        }
+        return section;
+      }));
+
+      setSnackbar({
+        open: true,
+        message: `${importData.exercices.length} exercice(s) importé(s) avec succès`,
+        severity: 'success'
+      });
+      
+      setImportDialogOpen(false);
+      setImportText('');
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: 'Erreur: Format de données invalide',
+        severity: 'error'
+      });
+    }
+  };
+
   const handleBack = () => {
     if (dateKey) {
       navigate(-1, {
@@ -596,7 +703,6 @@ const CreerSeance = () => {
                             gap={1}
                           >
                             <Stack direction="row" alignItems="center" spacing={{ xs: 1, sm: 2 }} sx={{ flex: 1, minWidth: 0 }}>
-                              {/* Icône drag avec points - visible sur mobile et desktop */}
                               <Box
                                 {...provided.dragHandleProps}
                                 sx={{
@@ -700,15 +806,16 @@ const CreerSeance = () => {
                                 <Delete fontSize="small" />
                               </IconButton>
                               {!isMobile && (
-                                <>
-                                  <IconButton size="small">
-                                    <Download fontSize="small" />
-                                  </IconButton>
-                                  <IconButton size="small">
-                                    <ContentCopy fontSize="small" />
-                                  </IconButton>
-                                </>
+                                <IconButton size="small">
+                                  <Download fontSize="small" />
+                                </IconButton>
                               )}
+                              <IconButton 
+                                size="small"
+                                onClick={(e) => handleCopyMenuOpen(e, section.id)}
+                              >
+                                <ContentCopy fontSize="small" />
+                              </IconButton>
                               <IconButton 
                                 size="small"
                                 onClick={() => toggleSection(section.id)}
@@ -1055,7 +1162,70 @@ const CreerSeance = () => {
         </Box>
       </Box>
       
-      {/* Exercise Selection Dialog */}
+      <Menu
+        anchorEl={copyMenuAnchor}
+        open={Boolean(copyMenuAnchor)}
+        onClose={handleCopyMenuClose}
+      >
+        <MenuItem onClick={handleExportExercices}>
+          <FileDownload sx={{ mr: 1, fontSize: 20 }} />
+          Exporter les exercices
+        </MenuItem>
+        <MenuItem onClick={handleOpenImportDialog}>
+          <FileUpload sx={{ mr: 1, fontSize: 20 }} />
+          Importer des exercices
+        </MenuItem>
+      </Menu>
+
+      <Dialog
+        open={importDialogOpen}
+        onClose={() => setImportDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        fullScreen={isMobile}
+      >
+        <DialogTitle>
+          <Stack direction="row" alignItems="center" justifyContent="space-between">
+            <Typography variant="h6" fontWeight={600}>
+              Importer des exercices
+            </Typography>
+            <IconButton onClick={() => setImportDialogOpen(false)}>
+              <Close />
+            </IconButton>
+          </Stack>
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            Collez ici les données d'exercices exportées précédemment :
+          </Typography>
+          <TextField
+            fullWidth
+            multiline
+            rows={10}
+            placeholder='{"version": "1.0", "exercices": [...]}'
+            value={importText}
+            onChange={(e) => setImportText(e.target.value)}
+            variant="outlined"
+            sx={{
+              fontFamily: 'monospace',
+              fontSize: '0.875rem',
+            }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setImportDialogOpen(false)}>
+            Annuler
+          </Button>
+          <Button 
+            onClick={handleImportExercices} 
+            variant="contained"
+            disabled={!importText.trim()}
+          >
+            Importer
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       <Dialog
         open={exerciceDialogOpen}
         onClose={() => setExerciceDialogOpen(false)}
@@ -1153,6 +1323,21 @@ const CreerSeance = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert 
+          onClose={() => setSnackbar({ ...snackbar, open: false })} 
+          severity={snackbar.severity}
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </DragDropContext>
   );
 };
