@@ -126,7 +126,8 @@ const CreerSeance = () => {
   const [selectedSectionForCopy, setSelectedSectionForCopy] = useState(null);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
   const [importDialogOpen, setImportDialogOpen] = useState(false);
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedExportId, setSelectedExportId] = useState(null);
+  const [availableExports, setAvailableExports] = useState([]);
 
   useEffect(() => {
     if (sessionData.autoSave && dateKey) {
@@ -414,17 +415,10 @@ const CreerSeance = () => {
         exercices: section.exercices
       };
       
-      const jsonString = JSON.stringify(exportData, null, 2);
-      
-      const blob = new Blob([jsonString], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `exercices_${section.title.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.json`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+      const exportId = `export_${Date.now()}`;
+      const allExports = JSON.parse(localStorage.getItem('exportedExercices') || '{}');
+      allExports[exportId] = exportData;
+      localStorage.setItem('exportedExercices', JSON.stringify(allExports));
       
       setSnackbar({
         open: true,
@@ -442,84 +436,88 @@ const CreerSeance = () => {
   };
 
   const handleOpenImportDialog = () => {
-    setSelectedFile(null);
+    const allExports = JSON.parse(localStorage.getItem('exportedExercices') || '{}');
+    const exportsList = Object.keys(allExports).map(key => ({
+      id: key,
+      ...allExports[key]
+    }));
+    setAvailableExports(exportsList);
+    setSelectedExportId(null);
     setImportDialogOpen(true);
     handleCopyMenuClose();
   };
 
-  const handleFileSelect = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      setSelectedFile(file);
-    }
-  };
-
   const handleImportExercices = () => {
-    if (!selectedFile) {
+    if (!selectedExportId) {
       setSnackbar({
         open: true,
-        message: 'Veuillez sélectionner un fichier',
+        message: 'Veuillez sélectionner un export',
         severity: 'warning'
       });
       return;
     }
 
-    const reader = new FileReader();
-    
-    reader.onload = (e) => {
-      try {
-        const importData = JSON.parse(e.target.result);
-        
-        if (!importData.exercices || !Array.isArray(importData.exercices)) {
-          throw new Error('Format de données invalide');
-        }
-
-        setSections(sections.map(section => {
-          if (section.id === selectedSectionForCopy) {
-            const timestamp = Date.now();
-            const newExercices = importData.exercices.map((ex, exIndex) => ({
-              ...ex,
-              id: `${section.id}-ex-${timestamp}-${exIndex}`,
-              series: ex.series.map((s, idx) => ({
-                ...s,
-                id: `${section.id}-ex-${timestamp}-${exIndex}-s${idx + 1}`
-              }))
-            }));
-
-            return {
-              ...section,
-              exercices: [...(section.exercices || []), ...newExercices]
-            };
-          }
-          return section;
-        }));
-
-        setSnackbar({
-          open: true,
-          message: `${importData.exercices.length} exercice(s) importé(s) avec succès`,
-          severity: 'success'
-        });
-        
-        setImportDialogOpen(false);
-        setSelectedFile(null);
-      } catch (error) {
-        setSnackbar({
-          open: true,
-          message: 'Erreur: Format de fichier invalide',
-          severity: 'error'
-        });
+    try {
+      const allExports = JSON.parse(localStorage.getItem('exportedExercices') || '{}');
+      const importData = allExports[selectedExportId];
+      
+      if (!importData || !importData.exercices || !Array.isArray(importData.exercices)) {
+        throw new Error('Format de données invalide');
       }
-    };
 
-    reader.onerror = () => {
+      setSections(sections.map(section => {
+        if (section.id === selectedSectionForCopy) {
+          const timestamp = Date.now();
+          const newExercices = importData.exercices.map((ex, exIndex) => ({
+            ...ex,
+            id: `${section.id}-ex-${timestamp}-${exIndex}`,
+            series: ex.series.map((s, idx) => ({
+              ...s,
+              id: `${section.id}-ex-${timestamp}-${exIndex}-s${idx + 1}`
+            }))
+          }));
+
+          return {
+            ...section,
+            exercices: [...(section.exercices || []), ...newExercices]
+          };
+        }
+        return section;
+      }));
+
       setSnackbar({
         open: true,
-        message: 'Erreur lors de la lecture du fichier',
+        message: `${importData.exercices.length} exercice(s) importé(s) avec succès`,
+        severity: 'success'
+      });
+      
+      setImportDialogOpen(false);
+      setSelectedExportId(null);
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: 'Erreur: Format de données invalide',
         severity: 'error'
       });
-    };
+    }
+  };
 
-    reader.readAsText(selectedFile);
+  const deleteExport = (exportId) => {
+    const allExports = JSON.parse(localStorage.getItem('exportedExercices') || '{}');
+    delete allExports[exportId];
+    localStorage.setItem('exportedExercices', JSON.stringify(allExports));
+    
+    const exportsList = Object.keys(allExports).map(key => ({
+      id: key,
+      ...allExports[key]
+    }));
+    setAvailableExports(exportsList);
+    
+    setSnackbar({
+      open: true,
+      message: 'Export supprimé',
+      severity: 'success'
+    });
   };
 
   const handleBack = () => {
@@ -1215,7 +1213,7 @@ const CreerSeance = () => {
         open={importDialogOpen}
         onClose={() => {
           setImportDialogOpen(false);
-          setSelectedFile(null);
+          setSelectedExportId(null);
         }}
         maxWidth="sm"
         fullWidth
@@ -1227,79 +1225,105 @@ const CreerSeance = () => {
             </Typography>
             <IconButton onClick={() => {
               setImportDialogOpen(false);
-              setSelectedFile(null);
+              setSelectedExportId(null);
             }}>
               <Close />
             </IconButton>
           </Stack>
         </DialogTitle>
         <DialogContent>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-            Sélectionnez un fichier JSON d'exercices précédemment exporté :
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            Sélectionnez un export précédent :
           </Typography>
           
-          <Box
-            sx={{
-              border: '2px dashed #e0e0e0',
-              borderRadius: 2,
-              p: 4,
-              textAlign: 'center',
-              bgcolor: '#fafafa',
-              cursor: 'pointer',
-              '&:hover': {
-                borderColor: '#1976d2',
-                bgcolor: '#f5f5f5',
-              },
-            }}
-          >
-            <input
-              accept=".json"
-              style={{ display: 'none' }}
-              id="import-file-input"
-              type="file"
-              onChange={handleFileSelect}
-            />
-            <label htmlFor="import-file-input">
-              <Button
-                component="span"
-                variant="outlined"
-                startIcon={<FileUpload />}
-                sx={{ mb: 2 }}
-              >
-                Choisir un fichier
-              </Button>
-            </label>
-            
-            {selectedFile ? (
-              <Box sx={{ mt: 2 }}>
-                <Typography variant="body2" color="primary" fontWeight={600}>
-                  Fichier sélectionné :
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {selectedFile.name}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  ({(selectedFile.size / 1024).toFixed(2)} KB)
-                </Typography>
-              </Box>
-            ) : (
+          {availableExports.length > 0 ? (
+            <List sx={{ maxHeight: 400, overflow: 'auto' }}>
+              {availableExports
+                .sort((a, b) => new Date(b.exportDate) - new Date(a.exportDate))
+                .map((exportItem) => (
+                  <ListItem 
+                    key={exportItem.id}
+                    disablePadding
+                    secondaryAction={
+                      <IconButton 
+                        edge="end" 
+                        aria-label="delete"
+                        onClick={() => deleteExport(exportItem.id)}
+                        size="small"
+                      >
+                        <Delete fontSize="small" />
+                      </IconButton>
+                    }
+                  >
+                    <ListItemButton
+                      selected={selectedExportId === exportItem.id}
+                      onClick={() => setSelectedExportId(exportItem.id)}
+                      sx={{
+                        borderRadius: 1,
+                        mb: 1,
+                        border: selectedExportId === exportItem.id ? '2px solid #1976d2' : '1px solid #e0e0e0',
+                        '&:hover': {
+                          borderColor: '#1976d2',
+                        },
+                      }}
+                    >
+                      <ListItemText
+                        primary={
+                          <Typography variant="body1" fontWeight={600}>
+                            {exportItem.sectionTitle}
+                          </Typography>
+                        }
+                        secondary={
+                          <Stack spacing={0.5} sx={{ mt: 0.5 }}>
+                            <Typography variant="caption" color="text.secondary">
+                              {exportItem.exercices?.length || 0} exercice(s)
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary">
+                              Exporté le {new Date(exportItem.exportDate).toLocaleDateString('fr-FR', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
+                            </Typography>
+                          </Stack>
+                        }
+                      />
+                    </ListItemButton>
+                  </ListItem>
+                ))}
+            </List>
+          ) : (
+            <Box
+              sx={{
+                border: '2px dashed #e0e0e0',
+                borderRadius: 2,
+                p: 4,
+                textAlign: 'center',
+                bgcolor: '#fafafa',
+              }}
+            >
               <Typography variant="body2" color="text.secondary">
-                Aucun fichier sélectionné
+                Aucun export disponible
               </Typography>
-            )}
-          </Box>
+              <Typography variant="caption" color="text.secondary">
+                Exportez d'abord des exercices pour pouvoir les importer
+              </Typography>
+            </Box>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => {
             setImportDialogOpen(false);
-            setSelectedFile(null);
+            setSelectedExportId(null);
           }}>
             Annuler
           </Button>
           <Button 
             onClick={handleImportExercices} 
             variant="contained"
-            disabled={!selectedFile}
+            disabled={!selectedExportId}
           >
             Importer
           </Button>
