@@ -126,7 +126,7 @@ const CreerSeance = () => {
   const [selectedSectionForCopy, setSelectedSectionForCopy] = useState(null);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
   const [importDialogOpen, setImportDialogOpen] = useState(false);
-  const [importText, setImportText] = useState('');
+  const [selectedFile, setSelectedFile] = useState(null);
 
   useEffect(() => {
     if (sessionData.autoSave && dateKey) {
@@ -416,18 +416,20 @@ const CreerSeance = () => {
       
       const jsonString = JSON.stringify(exportData, null, 2);
       
-      navigator.clipboard.writeText(jsonString).then(() => {
-        setSnackbar({
-          open: true,
-          message: `${section.exercices.length} exercice(s) copié(s) dans le presse-papiers`,
-          severity: 'success'
-        });
-      }).catch(() => {
-        setSnackbar({
-          open: true,
-          message: 'Erreur lors de la copie',
-          severity: 'error'
-        });
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `exercices_${section.title.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+      setSnackbar({
+        open: true,
+        message: `${section.exercices.length} exercice(s) exporté(s)`,
+        severity: 'success'
       });
     } else {
       setSnackbar({
@@ -440,52 +442,84 @@ const CreerSeance = () => {
   };
 
   const handleOpenImportDialog = () => {
+    setSelectedFile(null);
     setImportDialogOpen(true);
     handleCopyMenuClose();
   };
 
+  const handleFileSelect = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+    }
+  };
+
   const handleImportExercices = () => {
-    try {
-      const importData = JSON.parse(importText);
-      
-      if (!importData.exercices || !Array.isArray(importData.exercices)) {
-        throw new Error('Format de données invalide');
-      }
-
-      setSections(sections.map(section => {
-        if (section.id === selectedSectionForCopy) {
-          const newExercices = importData.exercices.map(ex => ({
-            ...ex,
-            id: `${section.id}-ex-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-            series: ex.series.map((s, idx) => ({
-              ...s,
-              id: `${section.id}-ex-${Date.now()}-s${idx + 1}`
-            }))
-          }));
-
-          return {
-            ...section,
-            exercices: [...(section.exercices || []), ...newExercices]
-          };
-        }
-        return section;
-      }));
-
+    if (!selectedFile) {
       setSnackbar({
         open: true,
-        message: `${importData.exercices.length} exercice(s) importé(s) avec succès`,
-        severity: 'success'
+        message: 'Veuillez sélectionner un fichier',
+        severity: 'warning'
       });
-      
-      setImportDialogOpen(false);
-      setImportText('');
-    } catch (error) {
+      return;
+    }
+
+    const reader = new FileReader();
+    
+    reader.onload = (e) => {
+      try {
+        const importData = JSON.parse(e.target.result);
+        
+        if (!importData.exercices || !Array.isArray(importData.exercices)) {
+          throw new Error('Format de données invalide');
+        }
+
+        setSections(sections.map(section => {
+          if (section.id === selectedSectionForCopy) {
+            const timestamp = Date.now();
+            const newExercices = importData.exercices.map((ex, exIndex) => ({
+              ...ex,
+              id: `${section.id}-ex-${timestamp}-${exIndex}`,
+              series: ex.series.map((s, idx) => ({
+                ...s,
+                id: `${section.id}-ex-${timestamp}-${exIndex}-s${idx + 1}`
+              }))
+            }));
+
+            return {
+              ...section,
+              exercices: [...(section.exercices || []), ...newExercices]
+            };
+          }
+          return section;
+        }));
+
+        setSnackbar({
+          open: true,
+          message: `${importData.exercices.length} exercice(s) importé(s) avec succès`,
+          severity: 'success'
+        });
+        
+        setImportDialogOpen(false);
+        setSelectedFile(null);
+      } catch (error) {
+        setSnackbar({
+          open: true,
+          message: 'Erreur: Format de fichier invalide',
+          severity: 'error'
+        });
+      }
+    };
+
+    reader.onerror = () => {
       setSnackbar({
         open: true,
-        message: 'Erreur: Format de données invalide',
+        message: 'Erreur lors de la lecture du fichier',
         severity: 'error'
       });
-    }
+    };
+
+    reader.readAsText(selectedFile);
   };
 
   const handleBack = () => {
@@ -1179,53 +1213,100 @@ const CreerSeance = () => {
 
       <Dialog
         open={importDialogOpen}
-        onClose={() => setImportDialogOpen(false)}
+        onClose={() => {
+          setImportDialogOpen(false);
+          setSelectedFile(null);
+        }}
         maxWidth="sm"
         fullWidth
-        fullScreen={isMobile}
       >
         <DialogTitle>
           <Stack direction="row" alignItems="center" justifyContent="space-between">
             <Typography variant="h6" fontWeight={600}>
               Importer des exercices
             </Typography>
-            <IconButton onClick={() => setImportDialogOpen(false)}>
+            <IconButton onClick={() => {
+              setImportDialogOpen(false);
+              setSelectedFile(null);
+            }}>
               <Close />
             </IconButton>
           </Stack>
         </DialogTitle>
         <DialogContent>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Collez ici les données d'exercices exportées précédemment :
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+            Sélectionnez un fichier JSON d'exercices précédemment exporté :
           </Typography>
-          <TextField
-            fullWidth
-            multiline
-            rows={10}
-            placeholder='{"version": "1.0", "exercices": [...]}'
-            value={importText}
-            onChange={(e) => setImportText(e.target.value)}
-            variant="outlined"
+          
+          <Box
             sx={{
-              fontFamily: 'monospace',
-              fontSize: '0.875rem',
+              border: '2px dashed #e0e0e0',
+              borderRadius: 2,
+              p: 4,
+              textAlign: 'center',
+              bgcolor: '#fafafa',
+              cursor: 'pointer',
+              '&:hover': {
+                borderColor: '#1976d2',
+                bgcolor: '#f5f5f5',
+              },
             }}
-          />
+          >
+            <input
+              accept=".json"
+              style={{ display: 'none' }}
+              id="import-file-input"
+              type="file"
+              onChange={handleFileSelect}
+            />
+            <label htmlFor="import-file-input">
+              <Button
+                component="span"
+                variant="outlined"
+                startIcon={<FileUpload />}
+                sx={{ mb: 2 }}
+              >
+                Choisir un fichier
+              </Button>
+            </label>
+            
+            {selectedFile ? (
+              <Box sx={{ mt: 2 }}>
+                <Typography variant="body2" color="primary" fontWeight={600}>
+                  Fichier sélectionné :
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {selectedFile.name}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  ({(selectedFile.size / 1024).toFixed(2)} KB)
+                </Typography>
+              </Box>
+            ) : (
+              <Typography variant="body2" color="text.secondary">
+                Aucun fichier sélectionné
+              </Typography>
+            )}
+          </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setImportDialogOpen(false)}>
+          <Button onClick={() => {
+            setImportDialogOpen(false);
+            setSelectedFile(null);
+          }}>
             Annuler
           </Button>
           <Button 
             onClick={handleImportExercices} 
             variant="contained"
-            disabled={!importText.trim()}
+            disabled={!selectedFile}
           >
             Importer
           </Button>
         </DialogActions>
       </Dialog>
 
+      {/* Exercise Selection Dialog */}
       <Dialog
         open={exerciceDialogOpen}
         onClose={() => setExerciceDialogOpen(false)}
