@@ -72,6 +72,7 @@ export default function SeanceExecute() {
   
   const [restTimer, setRestTimer] = useState(60); 
   const [restTimerActive, setRestTimerActive] = useState(false);
+  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
 
   const isMobile = useMediaQuery('(max-width:600px)');
 
@@ -90,6 +91,16 @@ export default function SeanceExecute() {
     
     return totalSeries > 0 ? (completedSeries / totalSeries) * 100 : 0;
   }, [cards]);
+
+  const groupedCards = [];
+  for (let i = 0; i < cards.length; i += 2) {
+    groupedCards.push(cards.slice(i, i + 2));
+  }
+
+  const swiperProgress = useMemo(() => {
+    if (groupedCards.length === 0) return 0;
+    return ((currentSlideIndex + 1) / groupedCards.length) * 100;
+  }, [currentSlideIndex, groupedCards.length]);
 
   useEffect(() => {
     const saveProgress = () => {
@@ -302,11 +313,6 @@ export default function SeanceExecute() {
   const handleDialogClose = () => {
     setSuperDialog(false);
   };
-  
-  const groupedCards = [];
-  for (let i = 0; i < cards.length; i += 2) {
-    groupedCards.push(cards.slice(i, i + 2));
-  }
 
   const functionRemplacer = (exercicesId) => {
     navigate("/remplacerexo", {
@@ -656,7 +662,7 @@ export default function SeanceExecute() {
           <LinearProgress 
             variant="determinate" 
             determinate 
-            value={Math.min(progress, 99.9)} 
+            value={Math.min(swiperProgress, 99.9)} 
             sx={{ 
               position: 'absolute',
               bottom: 0,
@@ -683,6 +689,7 @@ export default function SeanceExecute() {
               spaceBetween={30}
               loop={false}
               pagination={{ type: 'progressbar' }}
+              onSlideChange={(swiper) => setCurrentSlideIndex(swiper.activeIndex)}
             >
               {groupedCards.map((group, groupIndex) => (
                 <SwiperSlide key={groupIndex}>
