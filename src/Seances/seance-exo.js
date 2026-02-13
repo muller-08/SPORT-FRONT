@@ -76,7 +76,6 @@ export default function SeanceExecute() {
 
   const isMobile = useMediaQuery('(max-width:600px)');
 
-  // Calcul de la progression en temps réel avec useMemo pour optimiser
   const progress = useMemo(() => {
     if (!cards || cards.length === 0) return 0;
     
@@ -446,44 +445,49 @@ export default function SeanceExecute() {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {(card.series || []).map((serie, index) => (
-                        <TableRow 
-                          key={serie.id}
-                          sx={{  
-                            opacity: (card.checked || []).includes(index) ? 0.4 : 1,
-                            pointerEvents: (card.checked || []).includes(index) || restTimerActive ? "none" : "auto",
-                            cursor: restTimerActive ? 'not-allowed' : 'pointer'
-                          }}
-                        >
-                          <TableCell sx={{ fontSize: isMobile ? '0.75rem' : '0.875rem', px: isMobile ? 1 : 2 }}>
-                            {index + 1}
-                          </TableCell>
-                          <TableCell align="center" sx={{ fontSize: isMobile ? '0.75rem' : '0.875rem', px: isMobile ? 0.5 : 2 }}>
-                            {serie.type === 'reps' 
-                              ? (serie.reps || '-')
-                              : `${serie.duration || '-'}s`
-                            }
-                          </TableCell>
-                          <TableCell align="center" sx={{ fontSize: isMobile ? '0.75rem' : '0.875rem', px: isMobile ? 0.5 : 2 }}>
-                            {serie.rpe || '-'}
-                          </TableCell>
-                          <TableCell align="center" sx={{ px: isMobile ? 0.5 : 2 }}>
-                            <Checkbox
-                              icon={<DoneOutlineIcon sx={{ fontSize: isMobile ? '1.2rem' : '1.5rem' }} />}
-                              checkedIcon={<DoneIcon sx={{ fontSize: isMobile ? '1.2rem' : '1.5rem' }} />}
-                              checked={(card.checked || []).includes(index)}
-                              disabled={(card.checked || []).includes(index) || restTimerActive}
-                              onChange={() => handleCheckboxClick(card.id, index)}
-                              sx={{ 
-                                p: isMobile ? 0.5 : 1,
-                                '& .MuiSvgIcon-root': {
-                                  fontSize: isMobile ? '1.2rem' : '1.5rem'
-                                }
-                              }}
-                            />
-                          </TableCell>
-                        </TableRow>
-                      ))}
+                      {(card.series || []).map((serie, index) => {
+                        const isChecked = (card.checked || []).includes(index);
+                        const isDisabled = isChecked || restTimerActive;
+                        
+                        return (
+                          <TableRow 
+                            key={serie.id}
+                            sx={{  
+                              opacity: isChecked ? 0.4 : 1,
+                              pointerEvents: isDisabled ? "none" : "auto",
+                              cursor: isDisabled ? 'not-allowed' : 'pointer'
+                            }}
+                          >
+                            <TableCell sx={{ fontSize: isMobile ? '0.75rem' : '0.875rem', px: isMobile ? 1 : 2 }}>
+                              {index + 1}
+                            </TableCell>
+                            <TableCell align="center" sx={{ fontSize: isMobile ? '0.75rem' : '0.875rem', px: isMobile ? 0.5 : 2 }}>
+                              {serie.type === 'reps' 
+                                ? (serie.reps || '-')
+                                : `${serie.duration || '-'}s`
+                              }
+                            </TableCell>
+                            <TableCell align="center" sx={{ fontSize: isMobile ? '0.75rem' : '0.875rem', px: isMobile ? 0.5 : 2 }}>
+                              {serie.rpe || '-'}
+                            </TableCell>
+                            <TableCell align="center" sx={{ px: isMobile ? 0.5 : 2 }}>
+                              <Checkbox
+                                icon={<DoneOutlineIcon sx={{ fontSize: isMobile ? '1.2rem' : '1.5rem' }} />}
+                                checkedIcon={<DoneIcon sx={{ fontSize: isMobile ? '1.2rem' : '1.5rem' }} />}
+                                checked={isChecked}
+                                disabled={isDisabled}
+                                onChange={() => handleCheckboxClick(card.id, index)}
+                                sx={{ 
+                                  p: isMobile ? 0.5 : 1,
+                                  '& .MuiSvgIcon-root': {
+                                    fontSize: isMobile ? '1.2rem' : '1.5rem'
+                                  }
+                                }}
+                              />
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
                     </TableBody>
                   </Table>
                 </TableContainer>
@@ -502,6 +506,9 @@ export default function SeanceExecute() {
                     <TableBody>
                       {(card.series || []).map((serie, index) => {
                         const perf = (card.performances || []).find(p => p.setIndex === index);
+                        const isChecked = (card.checked || []).includes(index);
+                        const isDisabled = isChecked || restTimerActive;
+                        
                         return (
                           <TableRow key={serie.id}>
                             <TableCell sx={{ fontSize: isMobile ? '0.75rem' : '0.875rem', px: isMobile ? 1 : 2 }}>
@@ -520,8 +527,8 @@ export default function SeanceExecute() {
                               <Checkbox
                                 icon={<DoneOutlineIcon sx={{ fontSize: isMobile ? '1.2rem' : '1.5rem' }} />}
                                 checkedIcon={<DoneIcon sx={{ fontSize: isMobile ? '1.2rem' : '1.5rem' }} />}
-                                checked={(card.checked || []).includes(index)}
-                                disabled={(card.checked || []).includes(index) || restTimerActive}
+                                checked={isChecked}
+                                disabled={isDisabled}
                                 onChange={() => handleCheckboxClick(card.id, index)}
                                 sx={{ 
                                   p: isMobile ? 0.5 : 1,
@@ -694,7 +701,7 @@ export default function SeanceExecute() {
                 variant="contained"
                 sx={{
                   alignItems:"center",
-                  width: '60%',
+                  width: '40%',
                   position: "fixed",
                   bottom: 16,
                   left: "20%",

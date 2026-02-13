@@ -110,7 +110,7 @@ export const ExerciceProvider = ({ children }) => {
       videoUrl: "https://www.youtube.com/watch?v=LZ5gyhj5qeE",
       sets: 4,
       note:
-        "Avec barre olympique ou EZ, évoluer la charge selon la perception de l'effort.",
+        "",
       prescriptions: [
         { reps: "8", RPE: "8", repos: "03:00" },
         { reps: "8", RPE: "8", repos: "03:00" },
@@ -127,7 +127,7 @@ export const ExerciceProvider = ({ children }) => {
       image:'https://picsum.photos/800/400?9',
       groupe1: "",
       description:
-        "Descente complète jusqu'à ce que les hanches passent sous les genoux.",
+        "",
       videoUrl: "https://www.youtube.com/watch?v=LZ5gyhj5qeE"
     },
     {
@@ -140,7 +140,7 @@ export const ExerciceProvider = ({ children }) => {
         "Exercice polyarticulaire sollicitant fortement l'équilibre et le core.",
       videoUrl: "https://www.youtube.com/watch?v=LZ5gyhj5qeE",
       sets: 4,
-      note: "8 répétitions de chaque côté par série",
+      note: "",
       prescriptions: [
         { reps: "8", RPE: "8", repos: "-" },
         { reps: "8", RPE: "8", repos: "-" },
@@ -158,7 +158,7 @@ export const ExerciceProvider = ({ children }) => {
     description:"Conçue pour permettre aux débutants de travailler la force et la stabilité nécessaires pour maîtriser la position complète.", 
     videoUrl: 'https://www.youtube.com/watch?v=LZ5gyhj5qeE', 
     sets: 4, 
-    note: "Note du coach: Max en terme de durée, ça va évoluer !",
+    note: "",
     prescriptions: [
       { reps: "max", RPE:"8", repos: "-" },
       { reps: "max", RPE:"8", repos: "-" },
@@ -260,7 +260,7 @@ export const ExerciceProvider = ({ children }) => {
       description:"Consiste à utiliser une bande élastique pour réduire la charge à soulever, facilitant ainsi l'exécution du mouvement. Cette méthode est particulièrement adaptée aux débutants ou à ceux souhaitant progresser vers des tractions strictes sans assistance.", 
     videoUrl: 'https://www.youtube.com/watch?v=LZ5gyhj5qeE', 
     sets: 4, 
-    note: "Note du coach: Obligation de mettre l'élastique dès la 1ere série pour focus volume.",
+    note: "",
     prescriptions: [
       { reps: "max", RPE:"8", repos: "-" },
       { reps: "max", RPE:"8", repos: "-" },

@@ -152,18 +152,9 @@ export default function ListAct() {
             navigate(routes[newValue]);
           }}
         >
-          <BottomNavigationAction
-            label="Planning"
-            icon={<DashboardIcon />}
-          />
-          <BottomNavigationAction
-            label="Exercices"
-            icon={<FitnessCenterIcon />}
-          />
-          <BottomNavigationAction
-            label="Profile"
-            icon={<PersonOutlineIcon />}
-          />
+          <BottomNavigationAction label="Planning" icon={<DashboardIcon />} />
+          <BottomNavigationAction label="Exercices" icon={<FitnessCenterIcon />} />
+          <BottomNavigationAction label="Profile" icon={<PersonOutlineIcon />} />
         </BottomNavigation>
       </Paper>
     </Box>
