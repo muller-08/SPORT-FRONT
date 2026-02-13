@@ -591,8 +591,7 @@ export default function SeanceExecute() {
   };
 
   if (!seance) {
-    return (
-      <Box sx={{ p: 3 }}>
+    return (      <Box sx={{ p: 3 }}>
         <Typography>Séance non trouvée</Typography>
         <Button onClick={() => navigate('/planning')}>Retour</Button>
       </Box>
@@ -657,7 +656,7 @@ export default function SeanceExecute() {
           <LinearProgress 
             variant="determinate" 
             determinate 
-            value={Math.min(progress, 100)} 
+            value={Math.min(progress, 99.9)} 
             sx={{ 
               position: 'absolute',
               bottom: 0,
