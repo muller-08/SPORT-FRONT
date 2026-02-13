@@ -402,7 +402,6 @@ const CreerSeance = () => {
 
   const handleCopyMenuClose = () => {
     setCopyMenuAnchor(null);
-    setSelectedSectionForCopy(null);
   };
 
   const handleExportExercices = () => {
